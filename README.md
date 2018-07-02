@@ -1,4 +1,4 @@
-# BitMachine
+# BitBox
 A music machine made in the browser
 
 ## Instruments
@@ -26,3 +26,4 @@ Turn on specified note on given track
 
 -[Note][Track]
 Turn off specified note on given track
+
