@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:300');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+}
+
+.result-pass .message {
+  color: green;
+}
+
+.result-fail .message {
+  color: red;
+}
