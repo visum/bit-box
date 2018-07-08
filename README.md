@@ -1,16 +1,21 @@
 # BitBox
 A music machine made in the browser
 
-## Instruments
-To make noise, add instruments to the machine. Instruments may generate sound in the machine, or control external devices like MIDI synths. Each instrument is assigned to a track on the machine. A track can have only one instrument at a time.
+## Components
+A working system is a combination of event sources and targets, and audio sources and targets. Events are messages to turn a note on or off, among other things. An Instrument is an event target and audio source. The final audio source can be found on the Machine's `audioOutput` property, which is connected to a master gain node and finally the computer's speakers.
+
+A simple setup might look like this:
+* A `Qwerty` input sends events to...
+* a `BasicOscillator` instrument, which generates sound and is connected to...
+* the `audioOutput` on the `Machine`.
+
+A more involved setup can have multiple event sources, event transforms (such as the `VelocityAdjuster` and `Splitter`), a series of audio effects, and finally the `audioOutput` on the machine.
 
 ## Inputs
 An input is able to control one or more tracks of the machine.
 
 ### Rolls
-Rolls are a sequence of commands for the machine. A Roll is a 2D array with rows representing time increments and columns representing tracks. Each cell in the array may have zero or one command.
-
-Rolls may use the `Clock` class for timing and tempo control.
+Rolls consist of two parts: the setup and the sequence. The setup describes configuration of the event and audio trees. The sequence is a series of commands for the machine. The sequence is an array of arrays. Each array is a sequence of commands, called a "track". Each command is separated from the next by a period of time, expressed in clock ticks.
 
 ### MIDI inputs
 At some point, it will be possible to control the software instruments in the Machine using an external MIDI controller.
@@ -27,3 +32,7 @@ Turn on specified note on given track
 -[Note][Track]
 Turn off specified note on given track
 
+## Glossary
+
+### Velocity
+Based on the MIDI standard, a number between 0-127, inclusive, that usually determines the volume of the sound played.
