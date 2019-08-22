@@ -1,0 +1,27 @@
+{
+  "name": "bit-box",
+  "version": "1.0.0",
+  "description": "A music making machine based on connected modules",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/visum/bit-box.git"
+  },
+  "author": "Benjamin Howe <bdhowe@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/visum/bit-box/issues"
+  },
+  "homepage": "https://github.com/visum/bit-box#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "jest": "^24.9.0"
+  }
+}

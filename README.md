@@ -1,4 +1,5 @@
 # BitBox
+
 A music machine made in the browser
 
 BitBox is a system that can be configured with a series of modules connected together in arbitrary networks intended for web audio synthesis.
@@ -44,10 +45,6 @@ The BitBox is programmed by adding modules to the stage and connecting them to f
 
 Each module must be of one of the types `EventSource`, `EventTarget`, `AudioSource`, and `AudioTarget`, and can be any combination, including all of them.
 
-
-
 ### Networks
 
 Modules on the stage will indicate their Audio/Event Source/Target properties by displaying appropriate handles and drop-zones. Click and drag from a module's EventSource handle to another module's EventTarget dropzone to connect the two modules. Do a similar thing with a modules' Audio Source/Target zones to connect audio modules. The connections between all of the modules on the stage form an event network and audio network.
-
-
