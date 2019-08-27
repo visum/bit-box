@@ -6,3 +6,5 @@ class AudioNode {
     this.context = options.context;
   }
 }
+
+export default AudioNode;

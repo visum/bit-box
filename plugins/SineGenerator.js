@@ -11,8 +11,8 @@ class SineGenerator extends AudioNode {
 
     this.start.bind(this);
     this.stop.bind(this);
-    this.connectTo.bind(this);
-    this.disconnect.bind(this);
+    this.subscribeTo.bind(this);
+    this.unscribeFrom.bind(this);
     this.handleEvent.bind(this);
     this.connect.bind(this);
 

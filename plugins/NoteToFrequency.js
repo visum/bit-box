@@ -34,6 +34,7 @@ const generateNotesToNumbers = () => {
 
 class NoteToFrequency extends Observable {
   constructor() {
+    super();
     this.name = "NoteToFrequency";
     this.observed = new Map();
 
