@@ -39,7 +39,7 @@ There are a few other controls on the stage as well:
 
 The BitBox is programmed by adding modules to the stage and connecting them to form networks. 
 
-`EventSource`s make things happen by broadcasting events to connected `EventTarget`s. An `EventTarget` could be a drum machine, an arpeggiator, or a module that listens to the Web MIDI API or the computer's keyboard and emits events into the module network. And `EventTarget` recieves events and acts on them by generating audio or firing other, modified events (a transposer, for example).
+`EventSource`s make things happen by broadcasting events to connected `EventTarget`s. An `EventSource` could be a drum machine, an arpeggiator, or a module that listens to the Web MIDI API or the computer's keyboard and emits events into the module network. And `EventTarget` recieves events and acts on them by generating audio or firing other, modified events (a transposer, for example).
 
 `AudioSource` modules supply audio to `AudioTarget` modules. They can either generate the audio themselves, or modify audio that they recieved. In order to be heard from the computer speakers, an audio network must terminate at the _AudioDestination_, an `AudioTarget` module that is built-in to the stage.
 
@@ -48,3 +48,19 @@ Each module must be of one of the types `EventSource`, `EventTarget`, `AudioSour
 ### Networks
 
 Modules on the stage will indicate their Audio/Event Source/Target properties by displaying appropriate handles and drop-zones. Click and drag from a module's EventSource handle to another module's EventTarget dropzone to connect the two modules. Do a similar thing with a modules' Audio Source/Target zones to connect audio modules. The connections between all of the modules on the stage form an event network and audio network.
+
+### EventSource
+
+Extends `Observable`, which implements `observe`
+
+### EventTarget
+
+Implements `subsribeTo`
+
+### AudioSource
+
+Implements `connect`
+
+### AudioTarget
+
+Implements `getAudioNode`
