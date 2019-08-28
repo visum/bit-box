@@ -9,13 +9,6 @@ class SineGenerator extends AudioNode {
     this.oscillator = null;
     this.target = null;
 
-    this.start.bind(this);
-    this.stop.bind(this);
-    this.subscribeTo.bind(this);
-    this.unscribeFrom.bind(this);
-    this.handleEvent.bind(this);
-    this.connect.bind(this);
-
     this.eventHandlers = {
       "startSound": (event) => {
         this.start(event.frequency);
@@ -24,6 +17,8 @@ class SineGenerator extends AudioNode {
         this.stop();
       }
     };
+
+    this.handleEvent = this.handleEvent.bind(this);
   }
 
   connect(target) {
@@ -51,12 +46,14 @@ class SineGenerator extends AudioNode {
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
     oscillator.connect(this.target.getAudioNode());
     oscillator.start();
+    this.oscillator = oscillator;
   }
 
   stop() {
     const {target, oscillator} = this;
     oscillator.stop();
     oscillator.disconnect(target.getAudioNode());
+    this.oscillator = null;
   }
 
   handleEvent(event) {

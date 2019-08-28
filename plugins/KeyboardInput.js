@@ -24,12 +24,10 @@ const keyCodeToNote = {
 class KeyboardInput extends Observable {
   constructor() {
     super();
+    this.name = "KeyboardInput";
 
-    this.handleKeyDown.bind(this);
-    this.handleKeyUp.bind(this);
-
-    document.body.addEventListener("keydown", this.handleKeyDown);
-    document.body.addEventListener("keyup", this.handleKeyUp);
+    document.body.addEventListener("keydown", event => this.handleKeyDown(event));
+    document.body.addEventListener("keyup", event =>  this.handleKeyUp(event));
   }
 
   handleKeyDown(event) {

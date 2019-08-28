@@ -38,9 +38,6 @@ class NoteToFrequency extends Observable {
     this.name = "NoteToFrequency";
     this.observed = new Map();
 
-    this.subscribeTo.bind(this);
-    this.handleEvent.bind(this);
-
     this.eventHandlers = {
       play: event => {
         const noteNumber = NoteToFrequency.notesToNumbers[event.note];
@@ -51,10 +48,12 @@ class NoteToFrequency extends Observable {
           frequency
         });
       },
-      stop: event => {
+      stop: () => {
         this.notify({type: "stopSound"});
       }
     };
+
+    this.handleEvent = this.handleEvent.bind(this);
   }
 
   handleEvent(event) {
