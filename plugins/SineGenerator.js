@@ -6,15 +6,15 @@ class SineGenerator extends AudioNode {
 
     this.observers = [];
     this.observed = new Map();
-    this.oscillator = null;
+    this.oscillators = {};
     this.target = null;
 
     this.eventHandlers = {
-      "startSound": (event) => {
-        this.start(event.frequency);
+      startSound: event => {
+        this.start(event.frequency, event.id);
       },
-      "stopSound": () => {
-        this.stop();
+      stopSound: event => {
+        this.stop(event.id);
       }
     };
 
@@ -22,8 +22,10 @@ class SineGenerator extends AudioNode {
   }
 
   connect(target) {
-    if(typeof target.getAudioNode !== "function") {
-      throw new Error("Connection target of SineGenerator does not implement `getAudioNode`");
+    if (typeof target.getAudioNode !== "function") {
+      throw new Error(
+        "Connection target of SineGenerator does not implement `getAudioNode`"
+      );
     }
     this.target = target;
   }
@@ -32,28 +34,35 @@ class SineGenerator extends AudioNode {
     this.target = null;
   }
 
-  start(frequency) {
+  start(frequency, id) {
     if (!this.target) {
-      throw new Error("SineGenerator can't start before it is connected to an AudioTarget");
+      throw new Error(
+        "SineGenerator can't start before it is connected to an AudioTarget"
+      );
     }
 
-    const {context} = this;
-    if (this.oscillator) {
-      this.stop();
+    const { context } = this;
+    if (this.oscillators[id]) {
+      this.stop(id);
     }
+
     const oscillator = context.createOscillator();
     oscillator.type = "sine";
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
     oscillator.connect(this.target.getAudioNode());
     oscillator.start();
-    this.oscillator = oscillator;
+    this.oscillators[id] = oscillator;
   }
 
-  stop() {
-    const {target, oscillator} = this;
-    oscillator.stop();
-    oscillator.disconnect(target.getAudioNode());
-    this.oscillator = null;
+  stop(id) {
+    const { target, oscillators  } = this;
+    const oscillator = oscillators[id];
+    if (oscillator) {
+      oscillator.stop();
+      oscillator.disconnect(target.getAudioNode());
+    }
+    
+    oscillators[id] = null;
   }
 
   handleEvent(event) {
@@ -69,7 +78,6 @@ class SineGenerator extends AudioNode {
     }
     const observer = observable.observe(this.handleEvent);
     this.observed.set(observable, observer);
-    
   }
 
   unscribeFrom(observable) {
@@ -82,14 +90,26 @@ class SineGenerator extends AudioNode {
 }
 
 SineGenerator.respondsTo = {
-  "startSound": {
-    params: [
-      {"frequency": "number"}
-    ],
+  startSound: {
+    params: {
+      frequency: {
+        type: "number"
+      },
+      id: {
+        type: "number",
+        description:
+          "An arbitrary value used to correlate a sound across start/stop events."
+      }
+    },
     description: "Start making a noise"
   },
-  "stopSound": {
-    description: "Stop making noise"
+  stopSound: {
+    description: "Stop making noise",
+    params: {
+      id: {
+        type: "number"
+      }
+    }
   }
 };
 

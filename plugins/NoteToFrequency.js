@@ -5,24 +5,69 @@ const generateFrequencyTable = (referencePitch, referenceNote) => {
   const notes = [];
   for (let i = 0; i <= 127; i++) {
     const distanceFromReference = i - referenceNote;
-    notes[i] = referencePitch * Math.pow(Math.pow(2, 1/12), distanceFromReference);
+    notes[i] =
+      referencePitch * Math.pow(Math.pow(2, 1 / 12), distanceFromReference);
   }
   return notes;
 };
 
 const generateNotesToNumbers = () => {
-  const noteNames = ["C", "C#", "Db", "D", "D#", "Eb", "E", "Fb", "E#", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "Cb", "B#"];
-  const sequence =  [ 0,   1,    0,    1,   1,    0,    1,   0,    1,    0,   1,    0,    1,   1,    0,    1,   1,    0,    1,   0,    1]
+  const noteNames = [
+    "C",
+    "C#",
+    "Db",
+    "D",
+    "D#",
+    "Eb",
+    "E",
+    "Fb",
+    "E#",
+    "F",
+    "F#",
+    "Gb",
+    "G",
+    "G#",
+    "Ab",
+    "A",
+    "A#",
+    "Bb",
+    "B",
+    "Cb",
+    "B#"
+  ];
+  const sequence = [
+    0,
+    1,
+    0,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    0,
+    1,
+    1,
+    0,
+    1,
+    1,
+    0,
+    1,
+    0,
+    1
+  ];
   // 21 is A0
   let noteNumber = 20;
   let octaveNumber = 0;
   // octave numbers reset at C, but our list starts at A
   let octaveIndex = 15;
   const notesToNumbers = {};
-  while(noteNumber <= 108 ) {
-    while(octaveIndex < sequence.length) {
+  while (noteNumber <= 108) {
+    while (octaveIndex < sequence.length) {
       const thisNoteName = noteNames[octaveIndex] + octaveNumber;
-      const thisNoteNumber = noteNumber += sequence[octaveIndex];
+      const thisNoteNumber = (noteNumber += sequence[octaveIndex]);
       notesToNumbers[thisNoteName] = thisNoteNumber;
       octaveIndex += 1;
     }
@@ -44,12 +89,13 @@ class NoteToFrequency extends Observable {
         const frequency = NoteToFrequency.frequencyTable[noteNumber];
 
         this.notify({
+          ...event,
           type: "startSound",
           frequency
         });
       },
-      stop: () => {
-        this.notify({type: "stopSound"});
+      stop: event => {
+        this.notify({ ...event, type: "stopSound" });
       }
     };
 
@@ -87,16 +133,25 @@ NoteToFrequency.notesToNumbers = generateNotesToNumbers();
 
 NoteToFrequency.respondsTo = {
   play: {
-    params: [
-      {
-        note: "string",
-        description: "the note name, like A3, to start playing"
+    description: "Start playing a note",
+    params: {
+      note: {
+        type: "string",
+        description: "the note name, like Ab3, to start playing"
+      },
+      id: {
+        type: "number",
+        description: "an arbitrary value that correlates the start/stop events"
       }
-    ],
-    description: "Start playing a note"
+    }
   },
   stop: {
-    description: "Stop playing the currently playing note"
+    description: "Stop playing the note with the matching id",
+    params: {
+      id: {
+        type: "number"
+      }
+    }
   }
 };
 
