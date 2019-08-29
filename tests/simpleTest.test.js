@@ -35,5 +35,18 @@ export default suite => {
         return true;
       });
     });
+
+    test("assert.async", assert => {
+      assert.async(20)(resolve => {
+        assert(true);
+        resolve();
+      });
+    });
+
+    // test("assert.async times out", assert => {
+    //   assert.async(10)(resolve => {
+    //     setTimeout(resolve, 20);
+    //   });
+    // });
   });
 };

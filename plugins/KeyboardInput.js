@@ -36,8 +36,11 @@ class KeyboardInput extends Observable {
 
     this.notesOn = {};
 
-    document.body.addEventListener("keydown", event => this.handleKeyDown(event));
-    document.body.addEventListener("keyup", event =>  this.handleKeyUp(event));
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
+
+    document.body.addEventListener("keydown", this.handleKeyDown);
+    document.body.addEventListener("keyup", this.handleKeyUp);
   }
 
   handleKeyDown(event) {

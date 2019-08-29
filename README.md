@@ -2,9 +2,19 @@
 
 A music machine made in the browser
 
-BitBox is a system that can be configured with a series of modules connected together in arbitrary networks intended for web audio synthesis.
+## Features
 
-Predefined configurations of module networks can be provided on a “reel” which describes time-stamped instructions in BitBox Reel Language, or BBRL (pronounced “burbble”).
+* 99% browser metal
+* No build/transpile
+* Even tests run in the browser
+* ES6 modules
+* WebComponents (lit-html is the only imported library)
+
+## Overview
+
+_Much of the below is aspirational as I'm just starting development_
+
+BitBox is a system that can be configured with a series of modules connected together in arbitrary networks intended for web audio synthesis.
 
 While BitBox is designed with web-based music synthesis in mind, the machine can be used for a variety of sequencing, audio processing and event routing tasks, including MIDI or other hardware devices.
 
@@ -55,11 +65,11 @@ Extends `Observable`, which implements `observe`
 
 ### EventTarget
 
-Implements `subsribeTo`
+Implements `subsribeTo` and `unsubscribeFrom`
 
 ### AudioSource
 
-Implements `connect`
+Implements `connect` and `disconnect`, mirroring the platform AudioNode.
 
 ### AudioTarget
 

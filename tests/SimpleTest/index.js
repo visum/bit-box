@@ -83,6 +83,21 @@ export default class SimpleTest {
         caseElement.pass();
       };
 
+      assert.async = (timeout = 300) => {
+        return (handler) => {
+          
+          const timeoutId = setTimeout(() => {
+            caseElement.fail(`❌ async test timed out`);
+          }, timeout);
+
+          const resolver = () => {
+            clearTimeout(timeoutId);
+          };
+
+          handler(resolver);
+        };
+      };
+
       
       try {
         handler(assert);
