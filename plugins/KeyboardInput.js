@@ -1,4 +1,5 @@
 import Observable from "../lib/Observable.js";
+import { getNoteId } from "../lib/noteHelpers.js";
 
 const keyCodeToNote = {
   87: "C#4", // "w"
@@ -9,24 +10,16 @@ const keyCodeToNote = {
   79: "C#5", // "o"
   80: "D#5", // "p"
 
-  65: "C4",  // "a"
-  83: "D4",  // "s"
-  68: "E4",  // "d"
-  70: "F4",  // "f"
-  71: "G4",  // "g"
-  72: "A4",  // "h"
-  74: "B4",  // "j"
-  75: "C5",  // "k"
-  76: "D5",  // "l"
-  186: "E5"  // ";"
-};
-
-let noteId = 0;
-const getNoteId = () => {
-  if (noteId > 2000) {
-    noteId = 0;
-  }
-  return noteId++;
+  65: "C4", // "a"
+  83: "D4", // "s"
+  68: "E4", // "d"
+  70: "F4", // "f"
+  71: "G4", // "g"
+  72: "A4", // "h"
+  74: "B4", // "j"
+  75: "C5", // "k"
+  76: "D5", // "l"
+  186: "E5" // ";"
 };
 
 class KeyboardInput extends Observable {
@@ -46,21 +39,24 @@ class KeyboardInput extends Observable {
   handleKeyDown(event) {
     const id = getNoteId();
     const note = keyCodeToNote[event.keyCode];
-    this.notesOn[note] = id;
-    this.notify({type: "play", note, id});
+    if (note) {
+      this.notesOn[note] = id;
+      this.notify({ type: "play", note, id });
+    }
   }
 
   handleKeyUp(event) {
     const note = keyCodeToNote[event.keyCode];
-    const id = this.notesOn[note];
-    this.notify({type: "stop", id});
+    if (note) {
+      const id = this.notesOn[note];
+      this.notify({ type: "stop", id });
+    }
   }
 
   dispose() {
     document.body.removeEventListener("keydown", this.handleKeyDown);
     document.body.removeEventListener("keyup", this.handleKeyUp);
   }
-
 }
 
 export default KeyboardInput;

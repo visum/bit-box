@@ -4,7 +4,6 @@ class SineGenerator extends AudioNode {
   constructor(options) {
     super(options);
 
-    this.observers = [];
     this.observed = new Map();
     this.oscillators = {};
     this.target = null;

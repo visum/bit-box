@@ -8,14 +8,6 @@ export default suite => {
       assert(node);
     });
 
-    test("has frequencyTable", assert => {
-      assert.equivalent(440, NoteToFrequency.frequencyTable[69]);
-    });
-
-    test("has notesToNumbers", assert => {
-      assert.equivalent(80, NoteToFrequency.notesToNumbers["Ab5"]);
-    });
-
     test("subscribeTo and responds to play event", assert => {
       const node = new NoteToFrequency();
       const emitter = new Observable();
