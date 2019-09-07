@@ -1,11 +1,13 @@
 import Observable from "../lib/Observable.js";
 import {frequencyTable, notesToNumbers} from "../lib/noteHelpers.js";
+import EventTarget from "../lib/EventTarget.js";
 
 class NoteToFrequency extends Observable {
   constructor() {
     super();
     this.name = "NoteToFrequency";
-    this.observed = new Map();
+
+    EventTarget.apply(this);
 
     this.eventHandlers = {
       play: event => {
@@ -30,24 +32,6 @@ class NoteToFrequency extends Observable {
     const handler = this.eventHandlers[event.type];
     if (handler) {
       handler(event);
-    }
-  }
-
-  subscribeTo(observable) {
-    if (this.observed.has(observable)) {
-      throw new Error(
-        `NoteToFrequency is already observing ${observable.name}`
-      );
-    }
-    const observer = observable.observe(this.handleEvent);
-    this.observed.set(observable, observer);
-  }
-
-  unsubscribeFrom(observable) {
-    if (this.observed.has(observable)) {
-      const observer = this.observed.get(observable);
-      observer.dispose();
-      this.observed.delete(observable);
     }
   }
 }

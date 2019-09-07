@@ -12,8 +12,11 @@ export const plugins = [
     name: "destination"
   },
   {
-    path: "SineGenerator.js",
-    name: "noisemaker"
+    path: "Oscillator.js",
+    name: "noisemaker",
+    options: {
+      waveType: "square"
+    }
   },
   {
     path: "Transposer.js",

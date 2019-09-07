@@ -28,6 +28,7 @@ class KeyboardInput extends Observable {
     this.name = "KeyboardInput";
 
     this.notesOn = {};
+    this.keysDown = {};
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
@@ -37,6 +38,10 @@ class KeyboardInput extends Observable {
   }
 
   handleKeyDown(event) {
+    if (this.keysDown[event.keyCode]) {
+      return;
+    }
+    this.keysDown[event.keyCode] = true;
     const id = getNoteId();
     const note = keyCodeToNote[event.keyCode];
     if (note) {
@@ -46,6 +51,7 @@ class KeyboardInput extends Observable {
   }
 
   handleKeyUp(event) {
+    this.keysDown[event.keyCode] = false;
     const note = keyCodeToNote[event.keyCode];
     if (note) {
       const id = this.notesOn[note];

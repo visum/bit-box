@@ -5,7 +5,7 @@ import simpleTest from "./simpleTest.test.js";
 import audioDestination from "./AudioDestination.test.js";
 import keyboardInput from "./KeyboardInput.test.js";
 import noteToFrequency from "./NoteToFrequency.test.js";
-import sineGenerator from "./SineGenerator.test.js";
+import oscillator from "./Oscillator.test.js";
 
 const testGroups = [
   simpleTest,
@@ -13,7 +13,7 @@ const testGroups = [
   audioDestination,
   keyboardInput,
   noteToFrequency,
-  sineGenerator
+  oscillator
 ];
 
 const output = document.querySelector("#output");

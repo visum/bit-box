@@ -1,18 +1,18 @@
-import SineGenerator from "../plugins/SineGenerator.js";
+import Oscillator from "../plugins/Oscillator.js";
 import AudioContext from "./mocks/AudioContext.js";
 import AudioNode from "./mocks/AudioNode.js";
 import Observable from "../lib/Observable.js";
 
 export default suite => {
-  suite("SineGenerator", test => {
+  suite("Oscillator", test => {
     test("constructor", assert => {
-      const node = new SineGenerator({context:new AudioContext()});
+      const node = new Oscillator({context:new AudioContext(), waveType:"sine"});
       assert(node);
     });
 
     test("connect", assert => {
       const target = new AudioNode();
-      const node = new SineGenerator({context: new AudioContext()});
+      const node = new Oscillator({context: new AudioContext(), waveType:"sine"});
 
       node.connect(target);
 
@@ -20,7 +20,7 @@ export default suite => {
     });
 
     test("disconnect", assert => {
-      const node = new SineGenerator({conext: new AudioContext()});
+      const node = new Oscillator({conext: new AudioContext(), waveType:"sine"});
       const target = new AudioNode();
 
       node.connect(target);
@@ -31,7 +31,7 @@ export default suite => {
     });
 
     test("bad connection", assert => {
-      const node = new SineGenerator({context: new AudioContext()});
+      const node = new Oscillator({context: new AudioContext(), waveType:"sine"});
       const target = {};
 
       assert.throws(() => {
@@ -40,7 +40,7 @@ export default suite => {
     });
 
     test("start without target", assert => {
-      const node = new SineGenerator({conext: new AudioContext()});
+      const node = new Oscillator({conext: new AudioContext(), waveType:"sine"});
 
       assert.throws(() => {
         node.start(440, 12345);
@@ -50,7 +50,7 @@ export default suite => {
     test("start with target", assert => {
       const context = new AudioContext();
       const target = new AudioNode();
-      const node = new SineGenerator({context: context});
+      const node = new Oscillator({context: context, waveType:"sine"});
 
       node.connect(target);
 
@@ -64,7 +64,7 @@ export default suite => {
     test("stop", assert => {
       const context = new AudioContext();
       const target = new AudioNode();
-      const node = new SineGenerator({context: context});
+      const node = new Oscillator({context: context, waveType:"sine"});
 
       node.connect(target);
 
@@ -81,7 +81,7 @@ export default suite => {
     test("stop with multiple notes", assert => {
       const context = new AudioContext();
       const target = new AudioNode();
-      const node = new SineGenerator({context: context});
+      const node = new Oscillator({context: context, waveType:"sine"});
 
       node.connect(target);
 
@@ -99,7 +99,7 @@ export default suite => {
     });
 
     test("subscribeTo", assert => {
-      const node = new SineGenerator({context: new AudioContext()});
+      const node = new Oscillator({context: new AudioContext(), waveType:"sine"});
       const observable = new Observable();
       const target = new AudioNode();
 
@@ -125,14 +125,14 @@ export default suite => {
     });
 
     test("unsubscribeFrom", assert => {
-      const node = new SineGenerator({context: new AudioContext()});
+      const node = new Oscillator({context: new AudioContext(), waveType:"sine"});
       const observable = new Observable();
       const target = new AudioNode();
   
       node.subscribeTo(observable);
       node.connect(target);
   
-      node.unscribeFrom(observable);
+      node.unsubscribeFrom(observable);
   
       observable.notify({
         type: "startSound",

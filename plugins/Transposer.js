@@ -1,4 +1,5 @@
 import Observable from "../lib/Observable.js";
+import EventTarget from "../lib/EventTarget.js";
 import {
   notesToNumbers,
   numbersToNotes,
@@ -9,8 +10,9 @@ class Transposer extends Observable {
   constructor(config) {
     super();
     this.name = "Transposer";
-    this.observed = new Map();
     this.factor = config.factor;
+
+    EventTarget.apply(this);
 
     const notesPlaying = {};
 
@@ -35,22 +37,6 @@ class Transposer extends Observable {
     const handler = this.eventHandlers[event.type];
     if (handler) {
       handler(event);
-    }
-  }
-
-  subscribeTo(observable) {
-    if (this.observed.has(observable)) {
-      throw new Error(`Transposer is already observing ${observable.name}`);
-    }
-    const observer = observable.observe(this.handleEvent);
-    this.observed.set(observable, observer);
-  }
-
-  unsubscribeFrom(observable) {
-    if (this.observed.has(observable)) {
-      const observer = this.observed.get(observable);
-      observer.dispose();
-      this.observed.delete(observable);
     }
   }
 }

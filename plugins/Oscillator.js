@@ -1,10 +1,11 @@
 import AudioNode from "./AudioNode.js";
 import EventTarget from "../lib/EventTarget.js";
 
-class SineGenerator extends AudioNode {
+class Oscillator extends AudioNode {
   constructor(options) {
     super(options);
-    this.name = "SineGenerator";
+    this.name = "Oscillator";
+    this.waveType = options.waveType;
 
     EventTarget.apply(this);
 
@@ -12,11 +13,11 @@ class SineGenerator extends AudioNode {
     this.target = null;
 
     this.eventHandlers = {
-      startSound: event => {
-        this.start(event.frequency, event.id);
+      startSound: ({ frequency, id }) => {
+        this.start(frequency, id);
       },
-      stopSound: event => {
-        this.stop(event.id);
+      stopSound: ({ id }) => {
+        this.stop(id);
       }
     };
 
@@ -26,7 +27,7 @@ class SineGenerator extends AudioNode {
   connect(target) {
     if (typeof target.getAudioNode !== "function") {
       throw new Error(
-        "Connection target of SineGenerator does not implement `getAudioNode`"
+        "Connect target of Oscillator does not implement getAudioNode"
       );
     }
     this.target = target;
@@ -49,7 +50,7 @@ class SineGenerator extends AudioNode {
     }
 
     const oscillator = context.createOscillator();
-    oscillator.type = "sine";
+    oscillator.type = this.waveType;
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
     oscillator.connect(this.target.getAudioNode());
     oscillator.start();
@@ -57,13 +58,13 @@ class SineGenerator extends AudioNode {
   }
 
   stop(id) {
-    const { target, oscillators  } = this;
+    const {target, oscillators} = this;
     const oscillator = oscillators[id];
     if (oscillator) {
       oscillator.stop();
       oscillator.disconnect(target.getAudioNode());
     }
-    
+
     oscillators[id] = null;
   }
 
@@ -76,7 +77,7 @@ class SineGenerator extends AudioNode {
 
 }
 
-SineGenerator.respondsTo = {
+Oscillator.respondsTo = {
   startSound: {
     params: {
       frequency: {
@@ -100,4 +101,4 @@ SineGenerator.respondsTo = {
   }
 };
 
-export default SineGenerator;
+export default Oscillator;
