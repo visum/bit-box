@@ -1,33 +1,35 @@
 import AudioNode from "./AudioNode.js";
 import EventTarget from "../lib/EventTarget.js";
-import { notesToNumbers } from "../lib/noteHelpers.js";
+import { notesToNumbers, frequencyTable } from "../lib/noteHelpers.js";
 
-export default class LinearSampler extends AudioNode {
+export default class Sampler extends AudioNode {
   constructor(options) {
     super(options);
-    this.name = "LinearSampler";
+    this.name = "Sampler";
+
     EventTarget.apply(this);
 
-    this.load();
-
     this.target = null;
+
     this.players = {};
     this.buffer = null;
 
     this.eventHandlers = {
-      play: ({ note, id }) => {
+      play: ({note, id}) => {
         this.start(note, id);
       },
-      stop: ({ id }) => {
+      stop: ({id}) => {
         this.stop(id);
       }
     };
+
+    this.load();
 
     this.handleEvent = this.handleEvent.bind(this);
   }
 
   async load() {
-    const { filePath, context } = this.options;
+    const {filePath, context} = this.options;
     const audioData = await (await fetch(filePath)).arrayBuffer();
     context.decodeAudioData(audioData, buffer => {
       this.buffer = buffer;
@@ -35,7 +37,7 @@ export default class LinearSampler extends AudioNode {
   }
 
   start(note, id) {
-    const { context, buffer, options: {bottomNote, topNote, offset, loop, advance}, target } = this;
+    const {context, buffer, target, options: {naturalNote, loop}} = this;
     if (!target) {
       console.error("LinearSampler can't play before it is connected to a source");
       return;
@@ -45,28 +47,20 @@ export default class LinearSampler extends AudioNode {
     }
 
     const noteNumber = notesToNumbers[note];
-    const bottomNoteNumber = notesToNumbers[bottomNote];
-    const topNoteNumber = notesToNumbers[topNote];
+    const naturalNoteNumber = notesToNumbers[naturalNote];
+    const toneOffset = (noteNumber - naturalNoteNumber) * 100;
 
-    if (noteNumber > topNoteNumber) {
-      return;
-    }
-
-    const noteOffset = ((noteNumber - bottomNoteNumber) * offset) + advance;
-    
     const bufferSource = context.createBufferSource();
     const gainNode = context.createGain();
     bufferSource.buffer = buffer;
     bufferSource.connect(gainNode);
+    bufferSource.detune.value = toneOffset;
     gainNode.connect(this.target.getAudioNode());
     if (loop) {
       bufferSource.loop = true;
-      bufferSource.loopStart = noteOffset;
-      bufferSource.loopEnd = noteOffset + offset;
-      bufferSource.start(0, noteOffset);
-    } else {
-      bufferSource.start(0, noteOffset, offset);
     }
+
+    bufferSource.start();
 
     this.players[id] = {gainNode, bufferSource};
   }
@@ -75,7 +69,7 @@ export default class LinearSampler extends AudioNode {
     const player = this.players[id];
     if (player) {
       try {
-        await this.downRamp(player, 0.03);
+        await this.downRamp(player, 0.02);
         player.stop();
         player.disconnect();
       } catch (e) {}
@@ -90,6 +84,7 @@ export default class LinearSampler extends AudioNode {
       setTimeout(resolve, duration);
     });
   }
+
 
   handleEvent(event) {
     const handler = this.eventHandlers[event.type];
@@ -108,4 +103,8 @@ export default class LinearSampler extends AudioNode {
   disconnect() {
     this.target = null;
   }
+
+
+
+
 }
