@@ -3,6 +3,7 @@ import AudioNode from "./AudioNode.js";
 export default class Gain extends AudioNode{
   constructor(options) {
     super(options);
+    this.name="Gain";
     const gainValue = options.value || 0.8;
     
     this.gainNode = this.context.createGain();
