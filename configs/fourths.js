@@ -66,3 +66,14 @@ export const patches = [
     target: "destination"
   }
 ];
+
+export const meta = {
+  positions: {
+    input: [0, 40],
+    noteToFrequency: [120, 100],
+    transposer: [120, 10],
+    noisemaker: [240, 80],
+    finalGain: [360, 80],
+    destination: [480, 80]
+  }
+};

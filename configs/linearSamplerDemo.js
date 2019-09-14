@@ -45,3 +45,12 @@ export const patches = [
     target: "output"
   }
 ];
+
+export const meta = {
+  positions: {
+    input:[0, 40],
+    sampler:[120, 40],
+    finalGain:[240, 40],
+    output:[360, 40]
+  }
+};

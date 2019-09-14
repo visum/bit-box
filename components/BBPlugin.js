@@ -6,6 +6,8 @@ class BBPlugin extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
+    this.position = [0,0];
+    this.dimensions = [100, 60];
 
     render(this.render(), this.shadowRoot);
 
@@ -19,7 +21,7 @@ class BBPlugin extends HTMLElement {
 
   setPlugin(name, plugin) {
     this.nameField.textContent = name;
-    this.typeField.textContent = "Type:" + plugin.name;
+    this.typeField.textContent = plugin.name;
 
     if (isFn(plugin.connect)) {
       this.audioOut.classList.remove("inactive");
@@ -35,14 +37,35 @@ class BBPlugin extends HTMLElement {
     }
   }
 
+  setPosition([x,y]) {
+    this.position = [x, y];
+    this.shadowRoot.host.style.left = `${x}px`;
+    this.shadowRoot.host.style.top = `${y}px`;
+  }
+
+  getConnectorPositions() {
+    const [x,y] = this.position;
+    const [width, height] = this.dimensions;
+    return {
+      eventIn: [x + 6, y + 6],
+      eventOut: [x + width - 6, y + 6],
+      audioIn: [x + 6, y + height - 4],
+      audioOut: [x + width - 4, y + height - 4]
+    };
+  }
+
   render() {
     return html`
       <style>
-        #container {
+        * {
+          box-sizing: border-box;
+        }
+
+        :host {
           border: 1px solid black;
-          position: relative;
-          width: 200px;
-          height: 80px;
+          position: absolute;
+          width: 100px;
+          height: 60px;
         }
 
         #name {
@@ -74,6 +97,7 @@ class BBPlugin extends HTMLElement {
           bottom: 10px;
           width: 100%;
           padding-left: 5px;
+          background-color: white;
         }
 
         .connector {
@@ -108,7 +132,6 @@ class BBPlugin extends HTMLElement {
         }
       </style>
 
-      <div id="container">
         <div id="info">
         <h3 id="name"></h3>
         <span id="type"></span>
@@ -121,7 +144,6 @@ class BBPlugin extends HTMLElement {
           <div id="audio-in" class="connector inactive"></div>
           <div id="audio-out" class="connector inactive"></div>
         </div>
-      </div>
     `;
   }
 }

@@ -34,3 +34,12 @@ export const patches = [
     target: "destination"
   }
 ];
+
+export const meta = {
+  positions: {
+    keyboardInput: [0, 40],
+    noteToFrequency: [120, 40],
+    noisemaker: [240, 40],
+    destination: [360, 40]
+  }
+};
