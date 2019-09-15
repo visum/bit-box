@@ -6,8 +6,9 @@ class BBPlugin extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
-    this.position = [0,0];
+    this.position = [0, 0];
     this.dimensions = [100, 60];
+    this.dragStartPosition = [0, 0];
 
     render(this.render(), this.shadowRoot);
 
@@ -17,6 +18,13 @@ class BBPlugin extends HTMLElement {
     this.eventOut = this.shadowRoot.querySelector("#event-out");
     this.audioIn = this.shadowRoot.querySelector("#audio-in");
     this.audioOut = this.shadowRoot.querySelector("#audio-out");
+    this.handle = this.shadowRoot.querySelector("#handle");
+
+    this.startDrag = this.startDrag.bind(this);
+    this.endDrag = this.endDrag.bind(this);
+    this.handleDrag = this.handleDrag.bind(this);
+
+    this.attachEventListeners();
   }
 
   setPlugin(name, plugin) {
@@ -37,14 +45,14 @@ class BBPlugin extends HTMLElement {
     }
   }
 
-  setPosition([x,y]) {
+  setPosition([x, y]) {
     this.position = [x, y];
     this.shadowRoot.host.style.left = `${x}px`;
     this.shadowRoot.host.style.top = `${y}px`;
   }
 
   getConnectorPositions() {
-    const [x,y] = this.position;
+    const [x, y] = this.position;
     const [width, height] = this.dimensions;
     return {
       eventIn: [x + 6, y + 6],
@@ -52,6 +60,37 @@ class BBPlugin extends HTMLElement {
       audioIn: [x + 6, y + height - 4],
       audioOut: [x + width - 4, y + height - 4]
     };
+  }
+
+  setDragHandler(handler) {
+    this.dragHandler = handler;
+  }
+
+  handleDrag(event) {
+    const deltas = [
+      event.clientX - this.dragStartPosition[0],
+      event.clientY - this.dragStartPosition[1]
+    ];
+    this.dragStartPosition = [event.clientX, event.clientY];
+    this.dragHandler(this, deltas);
+  }
+
+  startDrag(event) {
+    document.addEventListener("mousemove", this.handleDrag);
+    this.dragStartPosition = [event.clientX, event.clientY];
+  }
+
+  endDrag() {
+    document.removeEventListener("mousemove", this.handleDrag);
+  }
+
+  attachEventListeners() {
+    this.handle.addEventListener("mousedown", this.startDrag);
+    this.handle.addEventListener("mouseup", this.endDrag);
+  }
+
+  dispose() {
+    this.handle.removeEventListener("down", this.startDrag);
   }
 
   render() {
@@ -95,9 +134,18 @@ class BBPlugin extends HTMLElement {
           position: absolute;
           top: 10px;
           bottom: 10px;
-          width: 100%;
-          padding-left: 5px;
-          background-color: white;
+          left: 15px;
+          width: 85px;
+          background-color: rgba(255, 255, 255, 0.7);
+        }
+
+        #handle {
+          position: absolute;
+          left: 0;
+          top: 10px;
+          width: 15px;
+          height: 15px;
+          cursor: grab;
         }
 
         .connector {
@@ -132,18 +180,19 @@ class BBPlugin extends HTMLElement {
         }
       </style>
 
-        <div id="info">
+      <div id="handle">🖐🏽</div>
+      <div id="info">
         <h3 id="name"></h3>
         <span id="type"></span>
-        </div>
-        <div id="event-connectors">
-          <div id="event-in" class="connector inactive"></div>
-          <div id="event-out" class="connector inactive"></div>
-        </div>
-        <div id="audio-connectors">
-          <div id="audio-in" class="connector inactive"></div>
-          <div id="audio-out" class="connector inactive"></div>
-        </div>
+      </div>
+      <div id="event-connectors">
+        <div id="event-in" class="connector inactive"></div>
+        <div id="event-out" class="connector inactive"></div>
+      </div>
+      <div id="audio-connectors">
+        <div id="audio-in" class="connector inactive"></div>
+        <div id="audio-out" class="connector inactive"></div>
+      </div>
     `;
   }
 }

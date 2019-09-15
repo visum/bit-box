@@ -1,4 +1,4 @@
-import {html, render} from "../lib/lit-html/lit-html.js";
+import { html, render } from "../lib/lit-html/lit-html.js";
 import ConfigLoader from "../lib/ConfigLoader.js";
 import "./BBPlugin.js";
 
@@ -7,47 +7,72 @@ const PLUGIN_ROOT = "../plugins/";
 class BBStage extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({mode: "open"});
-    this.canvasDimensions = [0,0];
+    this.attachShadow({ mode: "open" });
+    this.canvasDimensions = [0, 0];
     this.pluginElements = {};
-
-    this.configLoader = null;
+    this.configs = {};
     
+    this.configLoader = null;
+
     render(this.render(), this.shadowRoot);
 
     this.container = this.shadowRoot.querySelector("#container");
     this.pluginsContainer = this.shadowRoot.querySelector("#plugins");
     this.canvas = this.shadowRoot.querySelector("canvas");
     this.canvasContext = this.canvas.getContext("2d");
+    this.loadedNameElement = this.shadowRoot.querySelector("#loaded-path");
+
+    this.handleDrag = this.handleDrag.bind(this);
   }
 
-  async setConfigPath(path) {
-    this.pluginsContainer.innerHTML = "";
-    const loadedNameElement = this.shadowRoot.querySelector("#loaded-path");
-    loadedNameElement.textContent="Loading...";
+  async loadConfig(path) {
+    this.clearPlugins();
+    this.loadedNameElement.textContent = "Loading...";
     if (this.configLoader) {
       this.configLoader.dispose();
     }
     const audioContext = new AudioContext();
-    this.configLoader = new ConfigLoader({context:audioContext, pluginRoot:PLUGIN_ROOT});
+    this.configLoader = new ConfigLoader({
+      context: audioContext,
+      pluginRoot: PLUGIN_ROOT
+    });
     await this.configLoader.load(path);
-    loadedNameElement.textContent = path;
-    Object.entries(this.configLoader.plugins).forEach(([name, plugin]) => {
+    this.configs.plugins = this.configLoader.configs.plugins;
+    this.configs.patches = this.configLoader.configs.patches;
+    this.configs.meta = this.configLoader.configs.meta;
+    this.plugins = this.configLoader.plugins;
+
+    this.loadedNameElement.textContent = path;
+    Object.entries(this.plugins).forEach(([name, plugin]) => {
       const bbPlugin = document.createElement("bb-plugin");
-      if (this.configLoader.meta && this.configLoader.meta.positions) {
-        const position = this.configLoader.meta.positions[name] || [0,0];
+      if (this.configs.meta && this.configs.meta.positions) {
+        const position = this.configs.meta.positions[name] || [0, 0];
         bbPlugin.setPosition(position);
         if (this.canvasDimensions[0] < position[0] + 100) {
           this.canvasDimensions[0] = position[0] + 100;
-        };
+        }
         if (this.canvasDimensions[1] < position[1] + 100) {
           this.canvasDimensions[1] = position[1] + 100;
         }
       }
       bbPlugin.setPlugin(name, plugin);
+      bbPlugin.setDragHandler(this.handleDrag);
       this.pluginsContainer.appendChild(bbPlugin);
       this.pluginElements[name] = bbPlugin;
     });
+    this.updateSizes();
+    this.drawPatches();
+  }
+
+  handleDrag(element, delta) {
+    const newPosition = [element.position[0] + delta[0], element.position[1] + delta[1]];
+    element.setPosition(newPosition);
+    if (this.canvasDimensions[0] < newPosition[0] + 100) {
+      this.canvasDimensions[0] = newPosition[0] + 100;
+    }
+    if (this.canvasDimensions[1] < newPosition[1] + 100) {
+      this.canvasDimensions[1] = newPosition[1] + 100;
+    }
     this.updateSizes();
     this.drawPatches();
   }
@@ -65,49 +90,80 @@ class BBStage extends HTMLElement {
     context.clearRect(0, 0, width, height);
   }
 
+  clearPlugins() {
+    [...this.pluginsContainer.children].forEach(element => {
+      if (typeof element.dispose === "function") {
+        element.dispose();
+      }
+      this.pluginsContainer.removeChild(element);
+    });
+  }
+
   drawPatches() {
     this.clearCanvas();
     const context = this.canvasContext;
-    const patches = this.configLoader.patches;
+    const patches = this.configs.patches;
     patches.forEach(patch => {
       const type = patch.type;
-      const [startX, startY] = this.pluginElements[patch.source].getConnectorPositions()[type + "Out"];
-      const [endX, endY] = this.pluginElements[patch.target].getConnectorPositions()[type + "In"];
+      const [startX, startY] = this.pluginElements[
+        patch.source
+      ].getConnectorPositions()[type + "Out"];
+
+      const [endX, endY] = this.pluginElements[
+        patch.target
+      ].getConnectorPositions()[type + "In"];
+
+      context.beginPath();
       context.lineWidth = 1;
       context.strokeStyle = "black";
       context.moveTo(startX, startY);
       context.lineTo(endX, endY);
-      context.stroke();
+      context.stroke(); 
     });
+  }
+
+  getConfigs() {
+    const plugins = this.configs.plugins;
+    const patches = this.configs.patches;
+    const meta =  this.configs.meta;
+
+    Object.entries(this.pluginElements).forEach(([name, element]) => {
+      meta.positions[name] = element.position;
+    });
+
+    return {plugins, patches, meta};
   }
 
   render() {
     return html`
-    <style>
-      #stage-wrapper {
-        position: relative;
-      }
+      <style>
+        :host {
+          user-select: none;  
+        }
 
-      #plugins {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-      }
+        #stage-wrapper {
+          position: relative;
+        }
 
-      canvas {
-        position: absolute;
-      }
+        #plugins {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+        }
 
-    </style>
+        canvas {
+          position: absolute;
+        }
+      </style>
 
-    <div id="container">
-      Loaded plugin: <span id="loaded-path">none</span>.
-      <div id="stage-wrapper">
-        <canvas></canvas>
-        <div id="plugins"></div>
+      <div id="container">
+        Loaded plugin: <span id="loaded-path">none</span>.
+        <div id="stage-wrapper">
+          <canvas></canvas>
+          <div id="plugins"></div>
+        </div>
       </div>
-      
-    </div>`;
+    `;
   }
 }
 
