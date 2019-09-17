@@ -9,6 +9,7 @@ class BBPlugin extends HTMLElement {
     this.position = [0, 0];
     this.dimensions = [100, 60];
     this.dragStartPosition = [0, 0];
+    this.name = "";
 
     render(this.render(), this.shadowRoot);
 
@@ -28,6 +29,7 @@ class BBPlugin extends HTMLElement {
   }
 
   setPlugin(name, plugin) {
+    this.pluginName = name;
     this.nameField.textContent = name;
     this.typeField.textContent = plugin.name;
 
@@ -78,10 +80,12 @@ class BBPlugin extends HTMLElement {
   startDrag(event) {
     document.addEventListener("mousemove", this.handleDrag);
     this.dragStartPosition = [event.clientX, event.clientY];
+    this.handle.textContent = "✊🏽";
   }
 
   endDrag() {
     document.removeEventListener("mousemove", this.handleDrag);
+    this.handle.textContent = "🖐🏽";
   }
 
   attachEventListeners() {

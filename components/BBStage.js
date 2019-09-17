@@ -1,6 +1,6 @@
 import { html, render } from "../lib/lit-html/lit-html.js";
-import ConfigLoader from "../lib/ConfigLoader.js";
 import "./BBPlugin.js";
+import Program from "../lib/Program.js";
 
 const PLUGIN_ROOT = "../plugins/";
 
@@ -10,10 +10,8 @@ class BBStage extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.canvasDimensions = [0, 0];
     this.pluginElements = {};
-    this.configs = {};
+    this.program = null;
     
-    this.configLoader = null;
-
     render(this.render(), this.shadowRoot);
 
     this.container = this.shadowRoot.querySelector("#container");
@@ -26,39 +24,17 @@ class BBStage extends HTMLElement {
   }
 
   async loadConfig(path) {
+    this.program && this.program.dispose();
     this.clearPlugins();
-    this.loadedNameElement.textContent = "Loading...";
-    if (this.configLoader) {
-      this.configLoader.dispose();
-    }
+    
     const audioContext = new AudioContext();
-    this.configLoader = new ConfigLoader({
-      context: audioContext,
-      pluginRoot: PLUGIN_ROOT
-    });
-    await this.configLoader.load(path);
-    this.configs.plugins = this.configLoader.configs.plugins;
-    this.configs.patches = this.configLoader.configs.patches;
-    this.configs.meta = this.configLoader.configs.meta;
-    this.plugins = this.configLoader.plugins;
-
+    this.program = new Program({context:audioContext});
+    this.loadedNameElement.textContent = "Loading...";
+    await this.program.loadConfig(path, PLUGIN_ROOT);
     this.loadedNameElement.textContent = path;
-    Object.entries(this.plugins).forEach(([name, plugin]) => {
-      const bbPlugin = document.createElement("bb-plugin");
-      if (this.configs.meta && this.configs.meta.positions) {
-        const position = this.configs.meta.positions[name] || [0, 0];
-        bbPlugin.setPosition(position);
-        if (this.canvasDimensions[0] < position[0] + 100) {
-          this.canvasDimensions[0] = position[0] + 100;
-        }
-        if (this.canvasDimensions[1] < position[1] + 100) {
-          this.canvasDimensions[1] = position[1] + 100;
-        }
-      }
-      bbPlugin.setPlugin(name, plugin);
-      bbPlugin.setDragHandler(this.handleDrag);
-      this.pluginsContainer.appendChild(bbPlugin);
-      this.pluginElements[name] = bbPlugin;
+
+    Object.entries(this.program.plugins).forEach(([name, plugin]) => {
+      this.drawPlugin(name, plugin);
     });
     this.updateSizes();
     this.drawPatches();
@@ -66,6 +42,7 @@ class BBStage extends HTMLElement {
 
   handleDrag(element, delta) {
     const newPosition = [element.position[0] + delta[0], element.position[1] + delta[1]];
+    const pluginName = element.pluginName;
     element.setPosition(newPosition);
     if (this.canvasDimensions[0] < newPosition[0] + 100) {
       this.canvasDimensions[0] = newPosition[0] + 100;
@@ -73,6 +50,7 @@ class BBStage extends HTMLElement {
     if (this.canvasDimensions[1] < newPosition[1] + 100) {
       this.canvasDimensions[1] = newPosition[1] + 100;
     }
+    this.program.meta.positions[pluginName] = newPosition;
     this.updateSizes();
     this.drawPatches();
   }
@@ -90,6 +68,24 @@ class BBStage extends HTMLElement {
     context.clearRect(0, 0, width, height);
   }
 
+  drawPlugin(name, plugin) {
+    const bbPlugin = document.createElement("bb-plugin");
+    if (this.program.meta && this.program.meta.positions) {
+      const position = this.program.meta.positions[name] || [0, 0];
+      bbPlugin.setPosition(position);
+      if (this.canvasDimensions[0] < position[0] + 100) {
+        this.canvasDimensions[0] = position[0] + 100;
+      }
+      if (this.canvasDimensions[1] < position[1] + 100) {
+        this.canvasDimensions[1] = position[1] + 100;
+      }
+    }
+    bbPlugin.setPlugin(name, plugin);
+    bbPlugin.setDragHandler(this.handleDrag);
+    this.pluginsContainer.appendChild(bbPlugin);
+    this.pluginElements[name] = bbPlugin;
+  }
+
   clearPlugins() {
     [...this.pluginsContainer.children].forEach(element => {
       if (typeof element.dispose === "function") {
@@ -102,7 +98,7 @@ class BBStage extends HTMLElement {
   drawPatches() {
     this.clearCanvas();
     const context = this.canvasContext;
-    const patches = this.configs.patches;
+    const patches = this.program.patches;
     patches.forEach(patch => {
       const type = patch.type;
       const [startX, startY] = this.pluginElements[
@@ -122,16 +118,8 @@ class BBStage extends HTMLElement {
     });
   }
 
-  getConfigs() {
-    const plugins = this.configs.plugins;
-    const patches = this.configs.patches;
-    const meta =  this.configs.meta;
-
-    Object.entries(this.pluginElements).forEach(([name, element]) => {
-      meta.positions[name] = element.position;
-    });
-
-    return {plugins, patches, meta};
+  getConfigDump() {
+    return this.program.dumpConfig(PLUGIN_ROOT);
   }
 
   render() {

@@ -20,14 +20,7 @@ class BitBox extends HTMLElement {
     });
 
     dumpConfigButton.addEventListener("click", () => {
-      const configs = stage.getConfigs();
-      const output = `
-export const plugins = ${JSON.stringify(configs.plugins, 2)};
-export const patches = ${JSON.stringify(configs.patches, 2)};
-export const meta = ${JSON.stringify(configs.meta, 2)};
-      `;
-
-      console.log(output);
+      console.log(stage.getConfigDump());
     });
   }
 
