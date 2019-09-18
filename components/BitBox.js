@@ -1,5 +1,6 @@
 import {html, render} from "../lib/lit-html/lit-html.js";
 import "./BBStage.js";
+import "./BBModal.js";
 
 const configRoot = "../configs/";
 
@@ -13,10 +14,21 @@ class BitBox extends HTMLElement {
     const configSelect = this.shadowRoot.querySelector("#config");
     const stage = this.shadowRoot.querySelector("#stage");
     const dumpConfigButton = this.shadowRoot.querySelector("#dump-config");
+    const addPluginButton = this.shadowRoot.querySelector("#add-plugin");
+    const container = this.shadowRoot.querySelector("#container");
 
     configSelect.addEventListener("change", async () => {
       const path = configRoot + configSelect.value + ".js";
       stage.loadConfig(path);
+    });
+
+    addPluginButton.addEventListener("click", () => {
+      const modal = document.createElement("bb-modal");
+      container.appendChild(modal);
+
+      setTimeout(() => {
+        container.removeChild(modal);
+      }, 10000);
     });
 
     dumpConfigButton.addEventListener("click", () => {
@@ -43,6 +55,7 @@ class BitBox extends HTMLElement {
         <option>test</option>
       </select>
       <button id="dump-config">Dump Config</button>
+      <button id="add-plugin">Add Plugin</button>
       <bb-stage id="stage"/>
     </div>
     `;
