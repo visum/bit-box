@@ -11,7 +11,8 @@ class BBStage extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.canvasDimensions = [0, 0];
     this.pluginElements = {};
-    
+    this.program = null;
+
     render(this.render(), this.shadowRoot);
 
     this.container = this.shadowRoot.querySelector("#container");
@@ -19,36 +20,118 @@ class BBStage extends HTMLElement {
     this.canvas = this.shadowRoot.querySelector("canvas");
     this.canvasContext = this.canvas.getContext("2d");
 
+    this.connectionLineStart = null;
+    this.connectionLineEnd = null;
+    this.connectionEventSource = null;
+    this.connectionAudioSource = null;
+
     this.handleDrag = this.handleDrag.bind(this);
+
+    this.addEventListener("startEventConnection", event => {
+      this.addEventListener("mousemove", this.handleConnectionMove);
+
+      const pluginName = event.detail.pluginName;
+      const element = this.pluginElements[pluginName];
+
+      this.connectionLineStart = element.getConnectorPositions().eventOut;
+      this.connectionEventSource = pluginName;
+    });
+
+    this.addEventListener("endEventConnection", event => {
+      if (!this.connectionEventSource) {
+        return;
+      }
+      const pluginName = event.detail.pluginName;
+      this.program.connect(this.connectionEventSource, pluginName, "event");
+      this.drawCanvas();
+      this.cancelConnection();
+    });
+
+    this.addEventListener("startAudioConnection", event => {
+      this.addEventListener("mousemove", this.handleConnectionMove);
+      const pluginName = event.detail.pluginName;
+      this.connectionAudioSource = pluginName;
+      this.connectionLineStart = this.pluginElements[
+        pluginName
+      ].getConnectorPositions().audioOut;
+    });
+
+    this.addEventListener("endAudioConnection", event => {
+      if (!this.connectionAudioSource) {
+        return;
+      }
+      const pluginName = event.detail.pluginName;
+      this.program.connect(this.connectionAudioSource, pluginName, "audio");
+      this.drawCanvas();
+      this.cancelConnection();
+    });
+
+    this.addEventListener("mouseup", () => {
+      if (this.connectionAudioSource || this.connectionEventSource) {
+        this.cancelConnection();
+      }
+    });
+  }
+
+  handleConnectionMove(event) {
+    const canvasBounds = this.canvas.getBoundingClientRect();
+    this.connectionLineEnd = [
+      event.clientX - (canvasBounds.left + window.scrollX),
+      event.clientY - (canvasBounds.top + window.scrollY)
+    ];
+    this.clearCanvas();
+    this.drawPatches();
+    this.drawConnectionInProgress();
+  }
+
+  cancelConnection() {
+    this.connectionAudioSource = null;
+    this.connectionEventSource = null;
+    this.connectionLineStart = null;
+    this.connectionLineEnd = null;
+    this.removeEventListener("mousemove", this.handleConnectionMove);
+    this.drawCanvas();
   }
 
   newProgram() {
-    this.program.dispose();
-    this.clearPlugins();
-    this.program = new Program({context: new AudioContext()});
+    if (this.program) {
+      this.program.dispose();
+      this.clearPlugins();
+    }
+    this.program = new Program({ context: new AudioContext() });
     this.draw();
   }
 
   draw() {
+    this.clearPlugins();
     Object.entries(this.program.plugins).forEach(([name, plugin]) => {
       this.drawPlugin(name, plugin);
     });
     this.updateSizes();
+    this.drawCanvas();
+  }
+
+  drawCanvas() {
+    this.clearCanvas();
     this.drawPatches();
+    this.drawConnectionInProgress();
   }
 
   async loadConfig(path) {
     this.program && this.program.dispose();
     this.clearPlugins();
-    
+
     const audioContext = new AudioContext();
-    this.program = new Program({context:audioContext});
+    this.program = new Program({ context: audioContext });
     await this.program.loadConfig(path, PLUGIN_ROOT);
     this.draw();
   }
 
   handleDrag(element, delta) {
-    const newPosition = [element.position[0] + delta[0], element.position[1] + delta[1]];
+    const newPosition = [
+      element.position[0] + delta[0],
+      element.position[1] + delta[1]
+    ];
     const pluginName = element.pluginName;
     element.setPosition(newPosition);
     if (this.canvasDimensions[0] < newPosition[0] + 100) {
@@ -93,6 +176,21 @@ class BBStage extends HTMLElement {
     this.pluginElements[name] = bbPlugin;
   }
 
+  drawConnectionInProgress() {
+    if (!(this.connectionLineStart && this.connectionLineEnd)) {
+      return;
+    }
+    const [startX, startY] = this.connectionLineStart;
+    const [endX, endY] = this.connectionLineEnd;
+    const context = this.canvasContext;
+    context.beginPath();
+    context.lineWidth = 1;
+    context.strokeStyle = "red";
+    context.moveTo(startX, startY);
+    context.lineTo(endX, endY);
+    context.stroke();
+  }
+
   clearPlugins() {
     [...this.pluginsContainer.children].forEach(element => {
       if (typeof element.dispose === "function") {
@@ -121,7 +219,7 @@ class BBStage extends HTMLElement {
       context.strokeStyle = "black";
       context.moveTo(startX, startY);
       context.lineTo(endX, endY);
-      context.stroke(); 
+      context.stroke();
     });
   }
 
@@ -133,7 +231,7 @@ class BBStage extends HTMLElement {
     return html`
       <style>
         :host {
-          user-select: none;  
+          user-select: none;
         }
 
         #stage-wrapper {

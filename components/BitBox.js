@@ -68,6 +68,7 @@ class BitBox extends HTMLElement {
     <div id="container">
       <select id="config">
         <option></option>
+        <option>unconnected</option>
         <option>fourths</option>
         <option>linearSamplerDemo</option>
         <option>samplerDemo</option>

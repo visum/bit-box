@@ -91,6 +91,42 @@ class BBPlugin extends HTMLElement {
   attachEventListeners() {
     this.handle.addEventListener("mousedown", this.startDrag);
     this.handle.addEventListener("mouseup", this.endDrag);
+    this.eventOut.addEventListener("mousedown", () =>
+      this.dispatchEvent(
+        new CustomEvent("startEventConnection", {
+          bubbles: true,
+          composed: true,
+          detail: { pluginName: this.pluginName }
+        })
+      )
+    );
+    this.audioOut.addEventListener("mousedown", () =>
+      this.dispatchEvent(
+        new CustomEvent("startAudioConnection", {
+          bubbles: true,
+          composed: true,
+          detail: { pluginName: this.pluginName }
+        })
+      )
+    );
+    this.eventIn.addEventListener("mouseup", () =>
+      this.dispatchEvent(
+        new CustomEvent("endEventConnection", {
+          bubbles: true,
+          composed: true,
+          detail: { pluginName: this.pluginName }
+        })
+      )
+    );
+    this.audioIn.addEventListener("mouseup", () =>
+      this.dispatchEvent(
+        new CustomEvent("endAudioConnection", {
+          bubbles: true,
+          composed: true,
+          detail: { pluginName: this.pluginName }
+        })
+      )
+    );
   }
 
   dispose() {
@@ -157,6 +193,7 @@ class BBPlugin extends HTMLElement {
           position: absolute;
           width: 10px;
           height: 10px;
+          cursor: crosshair;
         }
 
         .inactive {
