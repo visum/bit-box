@@ -7,10 +7,10 @@ const PLUGIN_ROOT = "../plugins/";
 class BBStage extends HTMLElement {
   constructor() {
     super();
+
     this.attachShadow({ mode: "open" });
     this.canvasDimensions = [0, 0];
     this.pluginElements = {};
-    this.program = null;
     
     render(this.render(), this.shadowRoot);
 
@@ -18,9 +18,23 @@ class BBStage extends HTMLElement {
     this.pluginsContainer = this.shadowRoot.querySelector("#plugins");
     this.canvas = this.shadowRoot.querySelector("canvas");
     this.canvasContext = this.canvas.getContext("2d");
-    this.loadedNameElement = this.shadowRoot.querySelector("#loaded-path");
 
     this.handleDrag = this.handleDrag.bind(this);
+  }
+
+  newProgram() {
+    this.program.dispose();
+    this.clearPlugins();
+    this.program = new Program({context: new AudioContext()});
+    this.draw();
+  }
+
+  draw() {
+    Object.entries(this.program.plugins).forEach(([name, plugin]) => {
+      this.drawPlugin(name, plugin);
+    });
+    this.updateSizes();
+    this.drawPatches();
   }
 
   async loadConfig(path) {
@@ -29,15 +43,8 @@ class BBStage extends HTMLElement {
     
     const audioContext = new AudioContext();
     this.program = new Program({context:audioContext});
-    this.loadedNameElement.textContent = "Loading...";
     await this.program.loadConfig(path, PLUGIN_ROOT);
-    this.loadedNameElement.textContent = path;
-
-    Object.entries(this.program.plugins).forEach(([name, plugin]) => {
-      this.drawPlugin(name, plugin);
-    });
-    this.updateSizes();
-    this.drawPatches();
+    this.draw();
   }
 
   handleDrag(element, delta) {
@@ -145,7 +152,6 @@ class BBStage extends HTMLElement {
       </style>
 
       <div id="container">
-        Loaded plugin: <span id="loaded-path">none</span>.
         <div id="stage-wrapper">
           <canvas></canvas>
           <div id="plugins"></div>

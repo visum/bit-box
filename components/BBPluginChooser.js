@@ -1,39 +1,49 @@
 import { html, render } from "../lib/lit-html/lit-html.js";
 
 class BBPluginChooser extends HTMLElement {
-  constructor(plugins) {
+  constructor() {
     super();
     this.attachShadow({ mode: "open" });
 
-    render(this.render(plugins), this.shadowRoot);
+    render(this.render(), this.shadowRoot);
 
+    const pluginName = this.shadowRoot.querySelector("#plugin-name");
     const pluginSelect = this.shadowRoot.querySelector("#plugin-select");
     const addButton = this.shadowRoot.querySelector("#add-button");
     const cancelButton = this.shadowRoot.querySelector("#cancel-button");
 
-    const self = this;
-
     pluginSelect.addEventListener("change", () => {
-      if (this.value === "none") {
-        this.setAttribute("disabled");
+      if (pluginSelect.value === "none") {
+        addButton.setAttribute("disabled");
       } else {
-        this.removeAttribute("disabled");
+        if (pluginName.value == "") {
+          pluginName.value = pluginSelect.selectedOptions[0].innerText;
+        }
+        addButton.removeAttribute("disabled");
       }
     });
 
     addButton.addEventListener("click", () => {
-
+      const newPluginPath = pluginSelect.value;
+      const newPluginName = pluginName.value;
+      this.dispatchEvent(
+        new CustomEvent("selectplugin", { detail: { path: newPluginPath, name: newPluginName } })
+      );
     });
 
     cancelButton.addEventListener("click", () => {
-      
+      this.dispatchEvent(new CustomEvent("cancel"));
     });
-
   }
 
-  render(plugins) {
+  setPlugins(plugins) {
+    render(this.render(plugins), this.shadowRoot);
+  }
+
+  render(plugins = {}) {
     return html`
       <style></style>
+      <input id="plugin-name" /><br />
       <select id="plugin-select">
         <option value="none"></option>
         ${Object.entries(plugins).map(
@@ -48,3 +58,5 @@ class BBPluginChooser extends HTMLElement {
     `;
   }
 }
+
+window.customElements.define("bb-plugin-chooser", BBPluginChooser);
