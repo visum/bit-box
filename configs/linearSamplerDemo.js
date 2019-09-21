@@ -7,7 +7,7 @@ export const plugins = [
     name: "sampler",
     path: "LinearSampler.js",
     options: {
-      filePath: "/assets/pianoc3.mp3",
+      filePath: "./assets/pianoc3.mp3",
       bottomNote: "A0",
       topNote: "C7",
       offset: 3.36,
