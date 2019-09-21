@@ -2,7 +2,9 @@ import {html, render} from "../lib/lit-html/lit-html.js";
 import "./BBStage.js";
 import "./BBModal.js";
 import "./BBPluginChooser.js";
+import "./BBPluginConfig.js";
 import pluginRegistry from "../plugins/registry.js";
+import registry from "../plugins/registry.js";
 
 const configRoot = "../configs/";
 const pluginRoot = "../plugins/";
@@ -37,11 +39,17 @@ class BitBox extends HTMLElement {
       });
 
       chooser.addEventListener("selectplugin", async (event) => {
-        const {path, name} = event.detail;
+        const {path, name, config} = event.detail;
+        if (stage.program.plugins.hasOwnProperty(name)) {
+          alert(`There is already a plugin named ${name}.`);
+          return;
+        }
         container.removeChild(modal);
-        const plugin = await stage.program.loadPlugin(pluginRoot + path);
+        const plugin = await stage.program.loadPlugin(pluginRoot + path, config);
         stage.program.addPlugin(plugin, name);
         stage.draw();
+        dumpConfigButton.removeAttribute("disabled");
+        addPluginButton.removeAttribute("disabled");
       });
 
       container.appendChild(modal);
@@ -53,6 +61,37 @@ class BitBox extends HTMLElement {
 
     newProgramButton.addEventListener("click", () => {
       stage.newProgram();
+      dumpConfigButton.removeAttribute("disabled");
+      addPluginButton.removeAttribute("disabled");
+    });
+
+    this.addEventListener("configurePlugin", event => {
+      const pluginType = event.detail.pluginType;
+      const pluginName = event.detail.pluginName;
+      const plugin = stage.program.plugins[pluginName];
+      const modal = document.createElement("bb-modal");
+      const pluginConfigElement = document.createElement("bb-plugin-config");
+      pluginConfigElement.config = registry[pluginType].config;
+      pluginConfigElement.values = plugin;
+      const saveButton = document.createElement("button");
+      saveButton.textContent = "Save";
+      saveButton.addEventListener("click", () => {
+        const configs = pluginConfigElement.getConfigValues();
+        Object.entries(configs).forEach(([name, value]) => {
+          plugin[name] = value;
+        });
+        container.removeChild(modal);
+      });
+      const cancelButton = document.createElement("button");
+      cancelButton.textContent = "Cancel";
+      cancelButton.addEventListener("click", () => {
+        container.removeChild(modal);
+      });
+      modal.appendChild(pluginConfigElement);
+      modal.appendChild(saveButton);
+      modal.appendChild(cancelButton);
+
+      container.appendChild(modal);
     });
   }
 
@@ -76,8 +115,8 @@ class BitBox extends HTMLElement {
         <option>test</option>
       </select>
       <button id="new-program">New Program</button>
-      <button id="dump-config">Dump Config</button>
-      <button id="add-plugin">Add Plugin</button>
+      <button id="dump-config" disabled>Dump Config</button>
+      <button id="add-plugin" disabled>Add Plugin</button>
       <bb-stage id="stage"/>
     </div>
     `;

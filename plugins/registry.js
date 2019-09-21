@@ -1,11 +1,55 @@
 export default {
-  AudioDestination: "AudioDestination.js",
-  AudioNode: "AudioNode.js",
-  Gain: "Gain.js",
-  KeyboardInput: "KeyboardInput.js",
-  LinearSampler: "LinearSampler.js",
-  NoteToFrequency: "NoteToFrequency.js",
-  Oscillator: "Oscillator.js",
-  Sampler: "Sampler.js",
-  Transposer: "Transposer.js"
+  AudioDestination: {
+    path:"AudioDestination.js"
+  },
+  AudioNode: {
+    path: "AudioNode.js"
+  },
+  Gain: {
+    path: "Gain.js",
+    config: {
+      value: "number"
+    }
+  },
+  KeyboardInput: {
+    path: "KeyboardInput.js"
+  },
+  LinearSampler: {
+    path: "LinearSampler.js",
+    config: {
+      filePath: "string",
+      bottomNote: "string",
+      topNote: "string",
+      offset: "number",
+      loop: "boolean",
+      advance: "number"
+    }
+  },
+  NoteToFrequency: {
+    path: "NoteToFrequency.js"
+  },
+  Oscillator: {
+    path: "Oscillator.js",
+    config: {
+      waveType: [
+        "sine",
+        "sawtooth",
+        "square"
+      ]
+    }
+  },
+  Sampler: {
+    path: "Sampler.js",
+    config: {
+      filePath: "string",
+      naturalNote: "string",
+      loop: "boolean"
+    }
+  },
+  Transposer: {
+    path: "Transposer.js",
+    config: {
+      factor: "number"
+    }
+  }
 };

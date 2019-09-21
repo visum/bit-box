@@ -8,7 +8,14 @@ export default class Gain extends AudioNode{
     
     this.gainNode = this.context.createGain();
     this.gainNode.gain.setValueAtTime(gainValue, this.context.currentTime);
+  }
 
+  set value(newValue) {
+    this.gainNode.gain.setValueAtTime(newValue, this.context.currentTime);
+  }
+
+  get value() {
+    return this.gainNode.gain.value;
   }
 
   connect(target) {

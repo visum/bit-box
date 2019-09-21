@@ -18,7 +18,7 @@ class Transposer extends Observable {
 
     this.eventHandlers = {
       play: ({ note, id, ...event }) => {
-        const newNote = numbersToNotes[notesToNumbers[note] + 3];
+        const newNote = numbersToNotes[notesToNumbers[note] + this.factor];
         const newId = getNoteId();
         notesPlaying[id] = newId;
         this.notify({ ...event, note: newNote, id: newId });

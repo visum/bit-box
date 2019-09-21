@@ -1,11 +1,17 @@
 import { html, render } from "../lib/lit-html/lit-html.js";
+import "./BBPluginConfig.js";
 
 class BBPluginChooser extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
 
+    this.plugins = {};
+    this.selectedPluginType = null;
+
     render(this.render(), this.shadowRoot);
+
+    this.pluginConfig = this.shadowRoot.querySelector("#plugin-config");
 
     const pluginName = this.shadowRoot.querySelector("#plugin-name");
     const pluginSelect = this.shadowRoot.querySelector("#plugin-select");
@@ -15,19 +21,26 @@ class BBPluginChooser extends HTMLElement {
     pluginSelect.addEventListener("change", () => {
       if (pluginSelect.value === "none") {
         addButton.setAttribute("disabled");
+        this.selectedPluginType = null;
       } else {
         if (pluginName.value == "") {
           pluginName.value = pluginSelect.selectedOptions[0].innerText;
         }
         addButton.removeAttribute("disabled");
+        this.selectedPluginType = pluginSelect.value;
       }
+      render(this.render(), this.shadowRoot);
     });
 
     addButton.addEventListener("click", () => {
-      const newPluginPath = pluginSelect.value;
+      const selectedPluginType = pluginSelect.value;
+      const plugin = this.plugins[selectedPluginType];
+      const newPluginPath = plugin.path;
       const newPluginName = pluginName.value;
       this.dispatchEvent(
-        new CustomEvent("selectplugin", { detail: { path: newPluginPath, name: newPluginName } })
+        new CustomEvent("selectplugin", {
+          detail: { path: newPluginPath, name: newPluginName, config: this.getConfig() }
+        })
       );
     });
 
@@ -36,23 +49,31 @@ class BBPluginChooser extends HTMLElement {
     });
   }
 
-  setPlugins(plugins) {
-    render(this.render(plugins), this.shadowRoot);
+  getConfig() {
+    return this.pluginConfig.getConfigValues();
   }
 
-  render(plugins = {}) {
+  setPlugins(plugins) {
+    this.plugins = plugins;
+    render(this.render(), this.shadowRoot);
+  }
+
+  render() {
+    const { plugins, selectedPluginType } = this;
+    const config = (plugins[selectedPluginType] && plugins[selectedPluginType].config) || {};
     return html`
-      <style></style>
       <input id="plugin-name" /><br />
       <select id="plugin-select">
         <option value="none"></option>
         ${Object.entries(plugins).map(
-          ([name, path]) =>
+          ([name]) =>
             html`
-              <option value="${path}">${name}</option>
+              <option value="${name}">${name}</option>
             `
         )}
       </select>
+      <bb-plugin-config .config=${config} id="plugin-config"></bb-plugin-config>
+
       <button type="button" id="add-button" disabled>Add</button>
       <button type="button" id="cancel-button">Cancel</button>
     `;

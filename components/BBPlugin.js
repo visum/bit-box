@@ -10,6 +10,7 @@ class BBPlugin extends HTMLElement {
     this.dimensions = [100, 60];
     this.dragStartPosition = [0, 0];
     this.name = "";
+    this.pluginType = null;
 
     render(this.render(), this.shadowRoot);
 
@@ -20,6 +21,7 @@ class BBPlugin extends HTMLElement {
     this.audioIn = this.shadowRoot.querySelector("#audio-in");
     this.audioOut = this.shadowRoot.querySelector("#audio-out");
     this.handle = this.shadowRoot.querySelector("#handle");
+    this.gear = this.shadowRoot.querySelector("#gear");
 
     this.startDrag = this.startDrag.bind(this);
     this.endDrag = this.endDrag.bind(this);
@@ -32,6 +34,7 @@ class BBPlugin extends HTMLElement {
     this.pluginName = name;
     this.nameField.textContent = name;
     this.typeField.textContent = plugin.name;
+    this.pluginType = plugin.name;
 
     if (isFn(plugin.connect)) {
       this.audioOut.classList.remove("inactive");
@@ -91,6 +94,7 @@ class BBPlugin extends HTMLElement {
   attachEventListeners() {
     this.handle.addEventListener("mousedown", this.startDrag);
     this.handle.addEventListener("mouseup", this.endDrag);
+
     this.eventOut.addEventListener("mousedown", () =>
       this.dispatchEvent(
         new CustomEvent("startEventConnection", {
@@ -100,6 +104,7 @@ class BBPlugin extends HTMLElement {
         })
       )
     );
+
     this.audioOut.addEventListener("mousedown", () =>
       this.dispatchEvent(
         new CustomEvent("startAudioConnection", {
@@ -109,6 +114,7 @@ class BBPlugin extends HTMLElement {
         })
       )
     );
+
     this.eventIn.addEventListener("mouseup", () =>
       this.dispatchEvent(
         new CustomEvent("endEventConnection", {
@@ -118,6 +124,7 @@ class BBPlugin extends HTMLElement {
         })
       )
     );
+
     this.audioIn.addEventListener("mouseup", () =>
       this.dispatchEvent(
         new CustomEvent("endAudioConnection", {
@@ -127,10 +134,19 @@ class BBPlugin extends HTMLElement {
         })
       )
     );
+
+    this.gear.addEventListener("click", () => {
+      this.dispatchEvent(new CustomEvent("configurePlugin", {
+        bubbles: true,
+        composed: true,
+        detail: { pluginName: this.pluginName, pluginType: this.pluginType }
+      }));
+    });
   }
 
   dispose() {
-    this.handle.removeEventListener("down", this.startDrag);
+    this.handle.removeEventListener("mousedown", this.startDrag);
+    this.handle.removeEventListener("mouseup", this.endDrag);
   }
 
   render() {
@@ -182,10 +198,19 @@ class BBPlugin extends HTMLElement {
         #handle {
           position: absolute;
           left: 0;
-          top: 10px;
+          top: 5px;
           width: 15px;
           height: 15px;
           cursor: grab;
+        }
+
+        #gear {
+          position: absolute;
+          left: 0;
+          top: 25px;
+          width: 15px;
+          height: 15px;
+          cursor: pointer;
         }
 
         .connector {
@@ -222,6 +247,7 @@ class BBPlugin extends HTMLElement {
       </style>
 
       <div id="handle">🖐🏽</div>
+      <div id="gear">⚙️</div>
       <div id="info">
         <h3 id="name"></h3>
         <span id="type"></span>

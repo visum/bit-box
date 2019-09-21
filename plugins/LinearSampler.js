@@ -13,6 +13,12 @@ export default class LinearSampler extends AudioNode {
     this.target = null;
     this.players = {};
     this.buffer = null;
+    this.bottomNote = options.bottomNote;
+    this.topNote = options.topNote;
+    this.offset = options.offset;
+    this.loop = options.loop;
+    this.advance = options.advance;
+    this.filePath = options.filePath;
 
     this.eventHandlers = {
       play: ({ note, id }) => {
@@ -35,7 +41,7 @@ export default class LinearSampler extends AudioNode {
   }
 
   start(note, id) {
-    const { context, buffer, options: {bottomNote, topNote, offset, loop, advance}, target } = this;
+    const { context, buffer, bottomNote, topNote, offset, loop, advance, target } = this;
     if (!target) {
       console.error("LinearSampler can't play before it is connected to a source");
       return;

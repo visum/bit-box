@@ -7,9 +7,8 @@ export const plugins = [
     name: "sampler",
     path: "Sampler.js",
     options: {
-      filePath: "/assets/mao.mp3",
+      filePath: "./assets/mao.mp3",
       naturalNote: "C4",
-      sampleDuration: 1,
       loop: false
     }
   },
