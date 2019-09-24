@@ -26,6 +26,8 @@ class BitBox extends HTMLElement {
     configSelect.addEventListener("change", async () => {
       const path = configRoot + configSelect.value + ".js";
       stage.loadConfig(path);
+      dumpConfigButton.removeAttribute("disabled");
+      addPluginButton.removeAttribute("disabled");
     });
 
     addPluginButton.addEventListener("click", () => {

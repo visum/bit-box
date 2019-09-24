@@ -7,7 +7,7 @@ class BBPlugin extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.position = [0, 0];
-    this.dimensions = [100, 60];
+    this.dimensions = [140, 80];
     this.dragStartPosition = [0, 0];
     this.name = "";
     this.pluginType = null;
@@ -22,6 +22,7 @@ class BBPlugin extends HTMLElement {
     this.audioOut = this.shadowRoot.querySelector("#audio-out");
     this.handle = this.shadowRoot.querySelector("#handle");
     this.gear = this.shadowRoot.querySelector("#gear");
+    this.delete = this.shadowRoot.querySelector("#delete");
 
     this.startDrag = this.startDrag.bind(this);
     this.endDrag = this.endDrag.bind(this);
@@ -136,11 +137,23 @@ class BBPlugin extends HTMLElement {
     );
 
     this.gear.addEventListener("click", () => {
-      this.dispatchEvent(new CustomEvent("configurePlugin", {
-        bubbles: true,
-        composed: true,
-        detail: { pluginName: this.pluginName, pluginType: this.pluginType }
-      }));
+      this.dispatchEvent(
+        new CustomEvent("configurePlugin", {
+          bubbles: true,
+          composed: true,
+          detail: { pluginName: this.pluginName, pluginType: this.pluginType }
+        })
+      );
+    });
+
+    this.delete.addEventListener("click", () => {
+      this.dispatchEvent(
+        new CustomEvent("deletePlugin", {
+          bubbles: true,
+          composed: true,
+          detail: { pluginName: this.pluginName }
+        })
+      );
     });
   }
 
@@ -159,17 +172,17 @@ class BBPlugin extends HTMLElement {
         :host {
           border: 1px solid black;
           position: absolute;
-          width: 100px;
-          height: 60px;
+          width: 140px;
+          height: 80px;
         }
 
         #name {
-          font-size: 0.7rem;
+          font-size: 0.8rem;
           margin: 0;
         }
 
         #type {
-          font-size: 0.6rem;
+          font-size: 0.7rem;
         }
 
         #event-connectors {
@@ -188,9 +201,9 @@ class BBPlugin extends HTMLElement {
 
         #info {
           position: absolute;
-          top: 10px;
-          bottom: 10px;
-          left: 15px;
+          top: 15px;
+          bottom: 25px;
+          left: 25px;
           width: 85px;
           background-color: rgba(255, 255, 255, 0.7);
         }
@@ -198,7 +211,7 @@ class BBPlugin extends HTMLElement {
         #handle {
           position: absolute;
           left: 0;
-          top: 5px;
+          top: 10px;
           width: 15px;
           height: 15px;
           cursor: grab;
@@ -207,9 +220,16 @@ class BBPlugin extends HTMLElement {
         #gear {
           position: absolute;
           left: 0;
-          top: 25px;
+          top: 35px;
           width: 15px;
           height: 15px;
+          cursor: pointer;
+        }
+
+        #delete {
+          position: absolute;
+          bottom: 0;
+          left: 58px;
           cursor: pointer;
         }
 
@@ -248,6 +268,7 @@ class BBPlugin extends HTMLElement {
 
       <div id="handle">🖐🏽</div>
       <div id="gear">⚙️</div>
+      <div id="delete">🗑</div>
       <div id="info">
         <h3 id="name"></h3>
         <span id="type"></span>

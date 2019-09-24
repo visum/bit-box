@@ -2,7 +2,7 @@ import AudioNode from "./AudioNode.js";
 import EventTarget from "../lib/EventTarget.js";
 import { notesToNumbers, frequencyTable } from "../lib/noteHelpers.js";
 
-export default class Sampler extends AudioNode {
+class Sampler extends AudioNode {
   constructor(options) {
     super(options);
     this.name = "Sampler";
@@ -108,7 +108,12 @@ export default class Sampler extends AudioNode {
     this.target = null;
   }
 
-
-
-
 }
+
+Sampler.configTypes = {
+  filePath: "string",
+  naturalNote: "string",
+  loop: "boolean"
+};
+
+export default Sampler;

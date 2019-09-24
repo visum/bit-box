@@ -41,6 +41,10 @@ class Transposer extends Observable {
   }
 }
 
+Transposer.configTypes = {
+  factor: "number"
+};
+
 Transposer.respondsTo = {
   play: {
     description:

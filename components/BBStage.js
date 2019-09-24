@@ -71,6 +71,45 @@ class BBStage extends HTMLElement {
         this.cancelConnection();
       }
     });
+
+    this.addEventListener("deletePlugin", (event) => {
+      const pluginName = event.detail.pluginName;
+      this.program.removePlugin(pluginName);
+      this.draw();
+    });
+
+    this.canvas.addEventListener("dblclick", event => {
+      const canvasBounds = this.canvas.getBoundingClientRect();
+      const adjustedPoint = [
+        event.clientX - (canvasBounds.left + window.scrollX),
+        event.clientY - (canvasBounds.top + window.scrollY)
+      ];
+
+      const getLineLength = ([[x0, y0],[x1, y1]]) => {
+        const run = Math.abs(x1 - x0);
+        const rise = Math.abs(y1 - y0);
+        return Math.sqrt(Math.pow(run,2) + Math.pow(rise,2));
+      }
+
+
+      const matchedPatches = this.program.patches.filter((patch) => {
+        const [patchStart, patchEnd] = this.getPatchLine(patch);
+        const aToB = getLineLength([patchStart, patchEnd]);
+        const aToC = getLineLength([patchStart, adjustedPoint]);
+        const cToB = getLineLength([adjustedPoint, patchEnd]);
+        const segmentTotal = aToC + cToB;
+        return Math.abs(segmentTotal - aToB) < 4;
+      });
+
+      if (matchedPatches.length === 1) {
+        this.program.removePatch(matchedPatches[0]);
+        this.draw();
+      }
+      if (matchedPatches.length > 1) {
+        console.error("Too many matches!");
+      }
+      
+    });
   }
 
   handleConnectionMove(event) {
@@ -200,19 +239,25 @@ class BBStage extends HTMLElement {
     });
   }
 
+  getPatchLine(patch) {
+    const type = patch.type;
+    const [startX, startY] = this.pluginElements[
+      patch.source
+    ].getConnectorPositions()[type + "Out"];
+
+    const [endX, endY] = this.pluginElements[
+      patch.target
+    ].getConnectorPositions()[type + "In"];
+
+    return [[startX, startY], [endX, endY]];
+  }
+
   drawPatches() {
     this.clearCanvas();
     const context = this.canvasContext;
     const patches = this.program.patches;
     patches.forEach(patch => {
-      const type = patch.type;
-      const [startX, startY] = this.pluginElements[
-        patch.source
-      ].getConnectorPositions()[type + "Out"];
-
-      const [endX, endY] = this.pluginElements[
-        patch.target
-      ].getConnectorPositions()[type + "In"];
+      const [[startX, startY], [endX, endY]] = this.getPatchLine(patch);
 
       context.beginPath();
       context.lineWidth = 1;

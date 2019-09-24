@@ -77,6 +77,10 @@ class Oscillator extends AudioNode {
 
 }
 
+Oscillator.configTypes = {
+  waveType: "string"
+};
+
 Oscillator.respondsTo = {
   startSound: {
     params: {

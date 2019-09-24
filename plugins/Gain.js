@@ -1,6 +1,6 @@
 import AudioNode from "./AudioNode.js";
 
-export default class Gain extends AudioNode{
+class Gain extends AudioNode{
   constructor(options) {
     super(options);
     this.name="Gain";
@@ -36,5 +36,10 @@ export default class Gain extends AudioNode{
     return this.gainNode;
   }
 
-
 }
+
+Gain.configTypes = {
+  value: "number"
+};
+
+export default Gain;

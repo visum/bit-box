@@ -1,79 +1,97 @@
 export const plugins = [
   {
-    path: "KeyboardInput.js",
-    name: "input"
+    "name": "input",
+    "path": "KeyboardInput.js"
   },
   {
-    path: "NoteToFrequency.js",
-    name: "noteToFrequency"
+    "name": "noteToFrequency",
+    "path": "NoteToFrequency.js"
   },
   {
-    path: "AudioDestination.js",
-    name: "destination"
+    "name": "destination",
+    "path": "AudioDestination.js"
   },
   {
-    path: "Oscillator.js",
-    name: "noisemaker",
-    options: {
-      waveType: "square"
+    "name": "noisemaker",
+    "path": "Oscillator.js",
+    "options": {
+      "waveType": "square"
     }
   },
   {
-    path: "Transposer.js",
-    name: "transposer",
-    options: {
-      factor: 5
+    "name": "transposer",
+    "path": "Transposer.js",
+    "options": {
+      "factor": 5
     }
   },
   {
-    path: "Gain.js",
-    name: "finalGain",
-    options: {
-      value: 0.6
+    "name": "finalGain",
+    "path": "Gain.js",
+    "options": {
+      "value": 0.6000000238418579
     }
   }
 ];
 
 export const patches = [
   {
-    type: "event",
-    source: "input",
-    target: "noteToFrequency"
+    "source": "input",
+    "target": "noteToFrequency",
+    "type": "event"
   },
   {
-    type: "event",
-    source: "noteToFrequency",
-    target: "noisemaker"
+    "source": "noteToFrequency",
+    "target": "noisemaker",
+    "type": "event"
   },
   {
-    type: "event",
-    source: "input",
-    target: "transposer"
+    "source": "input",
+    "target": "transposer",
+    "type": "event"
   },
   {
-    type: "event",
-    source: "transposer",
-    target: "noteToFrequency"
+    "source": "transposer",
+    "target": "noteToFrequency",
+    "type": "event"
   },
   {
-    type: "audio",
-    source: "noisemaker",
-    target: "finalGain"
+    "source": "noisemaker",
+    "target": "finalGain",
+    "type": "audio"
   },
   {
-    type: "audio",
-    source: "finalGain",
-    target: "destination"
+    "source": "finalGain",
+    "target": "destination",
+    "type": "audio"
   }
 ];
 
 export const meta = {
-  positions: {
-    input: [0, 40],
-    noteToFrequency: [120, 100],
-    transposer: [120, 10],
-    noisemaker: [240, 80],
-    finalGain: [360, 80],
-    destination: [480, 80]
+  "positions": {
+    "input": [
+      0,
+      40
+    ],
+    "noteToFrequency": [
+      157,
+      190
+    ],
+    "transposer": [
+      153,
+      17
+    ],
+    "noisemaker": [
+      300,
+      57
+    ],
+    "finalGain": [
+      457,
+      66
+    ],
+    "destination": [
+      629,
+      68
+    ]
   }
 };

@@ -1,45 +1,55 @@
 export const plugins = [
   {
-    path: "KeyboardInput.js",
-    name: "keyboardInput"
+    "name": "keyboardInput",
+    "path": "KeyboardInput.js"
   },
   {
-    path: "AudioDestination.js",
-    name: "destination"
+    "name": "destination",
+    "path": "AudioDestination.js"
   },
   {
-    path: "NoteToFrequency.js",
-    name: "noteToFrequency"
+    "name": "noteToFrequency",
+    "path": "NoteToFrequency.js"
   },
   {
-    path: "SineGenerator.js",
-    name: "noisemaker"
+    "name": "noisemaker",
+    "path": "SineGenerator.js"
   }
 ];
-
 export const patches = [
   {
-    type: "event",
-    source: "keyboardInput",
-    target: "noteToFrequency"
+    "source": "keyboardInput",
+    "target": "noteToFrequency",
+    "type": "event"
   },
   {
-    type: "event",
-    source: "noteToFrequency",
-    target: "noisemaker"
+    "source": "noteToFrequency",
+    "target": "noisemaker",
+    "type": "event"
   },
   {
-    type: "audio",
-    source: "noisemaker",
-    target: "destination"
+    "source": "noisemaker",
+    "target": "destination",
+    "type": "audio"
   }
 ];
-
 export const meta = {
-  positions: {
-    keyboardInput: [0, 40],
-    noteToFrequency: [120, 40],
-    noisemaker: [240, 40],
-    destination: [360, 40]
+  "positions": {
+    "keyboardInput": [
+      0,
+      40
+    ],
+    "noteToFrequency": [
+      163,
+      39
+    ],
+    "noisemaker": [
+      333,
+      30
+    ],
+    "destination": [
+      505,
+      32
+    ]
   }
 };

@@ -2,7 +2,7 @@ import AudioNode from "./AudioNode.js";
 import EventTarget from "../lib/EventTarget.js";
 import { notesToNumbers } from "../lib/noteHelpers.js";
 
-export default class LinearSampler extends AudioNode {
+class LinearSampler extends AudioNode {
   constructor(options) {
     super(options);
     this.name = "LinearSampler";
@@ -115,3 +115,14 @@ export default class LinearSampler extends AudioNode {
     this.target = null;
   }
 }
+
+LinearSampler.configTypes = {
+  filePath: "string",
+  bottomNote: "string",
+  topNote: "string",
+  offset: "number",
+  loop: "boolean",
+  advance: "number"
+};
+
+export default LinearSampler;
