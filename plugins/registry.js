@@ -51,5 +51,17 @@ export default {
     config: {
       factor: "number"
     }
+  },
+  PeriodicWave: {
+    path: "PeriodicWave.js",
+    config: {
+      waveTablePath: [
+        "../assets/waveTables/brass.js",
+        "../assets/waveTables/britBlues.js",
+        "../assets/waveTables/throaty.js"
+      ],
+      attack: "number",
+      decay: "number"
+    }
   }
 };

@@ -114,7 +114,7 @@ class BitBox extends HTMLElement {
         <option>linearSamplerDemo</option>
         <option>samplerDemo</option>
         <option>simpleKeyboard</option>
-        <option>test</option>
+        <option>periodicWave</option>
       </select>
       <button id="new-program">New Program</button>
       <button id="dump-config" disabled>Dump Config</button>

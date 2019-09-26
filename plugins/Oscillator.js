@@ -40,7 +40,7 @@ class Oscillator extends AudioNode {
   start(frequency, id) {
     if (!this.target) {
       throw new Error(
-        "SineGenerator can't start before it is connected to an AudioTarget"
+        "Oscillator can't start before it is connected to an AudioTarget"
       );
     }
 
