@@ -35,7 +35,9 @@ export default {
         "sine",
         "sawtooth",
         "square"
-      ]
+      ],
+      attack: "number",
+      decay: "number"
     }
   },
   Sampler: {
@@ -56,12 +58,18 @@ export default {
     path: "PeriodicWave.js",
     config: {
       waveTablePath: [
-        "../assets/waveTables/brass.js",
+        "../assets/waveTables/bass.js",
         "../assets/waveTables/britBlues.js",
         "../assets/waveTables/throaty.js"
       ],
       attack: "number",
       decay: "number"
+    }
+  },
+  Delay: {
+    path: "Delay.js",
+    config: {
+      time: "number"
     }
   }
 };

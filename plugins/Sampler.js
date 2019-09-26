@@ -9,7 +9,7 @@ class Sampler extends AudioNode {
 
     EventTarget.apply(this);
 
-    this.target = null;
+    this.targets = new Map();
 
     this.players = {};
     this.buffer = null;
@@ -41,8 +41,8 @@ class Sampler extends AudioNode {
   }
 
   start(note, id) {
-    const {context, buffer, target, naturalNote, loop} = this;
-    if (!target) {
+    const {context, buffer, targets, naturalNote, loop} = this;
+    if (targets.size === 0) {
       console.error("LinearSampler can't play before it is connected to a source");
       return;
     }
@@ -59,7 +59,7 @@ class Sampler extends AudioNode {
     bufferSource.buffer = buffer;
     bufferSource.connect(gainNode);
     bufferSource.detune.value = toneOffset;
-    gainNode.connect(this.target.getAudioNode());
+    targets.forEach(targetNode => gainNode.connect(targetNode));
     if (loop) {
       bufferSource.loop = true;
     }
@@ -71,12 +71,16 @@ class Sampler extends AudioNode {
 
   async stop(id) {
     const player = this.players[id];
+    const {bufferSource, gainNode} = player;
     if (player) {
       try {
         await this.downRamp(player, 0.02);
-        player.stop();
-        player.disconnect();
-      } catch (e) {}
+        bufferSource.stop();
+        bufferSource.disconnect();
+        this.targets.forEach(targetNode => gainNode.disconnect(targetNode));
+      } catch (e) {
+        console.error(e);
+      }
       this.players[id] = undefined;
     }
   }
@@ -101,11 +105,11 @@ class Sampler extends AudioNode {
     if (typeof target.getAudioNode !== "function") {
       throw new Error("Connect target of LinearSampler does not implement getAudioNode");
     }
-    this.target = target;
+    this.targets.set(target, target.getAudioNode());
   }
 
-  disconnect() {
-    this.target = null;
+  disconnect(target) {
+    this.targets.delete(target);
   }
 
 }

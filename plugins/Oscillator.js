@@ -13,7 +13,7 @@ class Oscillator extends AudioNode {
 
     this.oscillators = {};
     this.gains = {};
-    this.target = null;
+    this.targets = new Map();
 
     this.eventHandlers = {
       startSound: ({ frequency, id }) => {
@@ -33,21 +33,21 @@ class Oscillator extends AudioNode {
         "Connect target of Oscillator does not implement getAudioNode"
       );
     }
-    this.target = target;
+    this.targets.set(target, target.getAudioNode());
   }
 
-  disconnect() {
-    this.target = null;
+  disconnect(target) {
+    this.targets.delete(target);
   }
 
   start(frequency, id) {
-    if (!this.target) {
+    if (this.targets.size === 0) {
       throw new Error(
         "Oscillator can't start before it is connected to an AudioTarget"
       );
     }
 
-    const { context, oscillators, gains, target, waveType, attack } = this;
+    const { context, oscillators, gains, targets, waveType, attack } = this;
     if (this.oscillators[id]) {
       this.stop(id);
     }
@@ -59,7 +59,9 @@ class Oscillator extends AudioNode {
     oscillator.type = waveType;
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
     oscillator.connect(gain);
-    gain.connect(target.getAudioNode());
+    targets.forEach((targetNode) => {
+      gain.connect(targetNode);
+    });
     oscillator.start();
     gain.gain.linearRampToValueAtTime(1, context.currentTime + attack);
 
@@ -68,7 +70,7 @@ class Oscillator extends AudioNode {
   }
 
   stop(id) {
-    const {target, oscillators, gains, decay, context} = this;
+    const {targets, oscillators, gains, decay, context} = this;
     const oscillator = oscillators[id];
     const gain = gains[id];
     if (oscillator) {
@@ -76,7 +78,10 @@ class Oscillator extends AudioNode {
       gain.gain.linearRampToValueAtTime(0, context.currentTime + decay);
       setTimeout(() => {
         oscillator.stop();
-        gain.disconnect(target.getAudioNode());
+        targets.forEach(targetNode => {
+          gain.disconnect(targetNode);
+        });
+        
       }, decay * 1000);
     }
 

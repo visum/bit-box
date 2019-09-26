@@ -15,7 +15,7 @@ class PeriodicWave extends AudioNode {
 
     this.oscillators = {};
     this.gains = {};
-    this.target = null;
+    this.targets = new Map();
 
     this.eventHandlers = {
       startSound: ({ frequency, id }) => {
@@ -53,15 +53,15 @@ class PeriodicWave extends AudioNode {
         "Connect target of PeriodicWave does not implement getAudioNode()"
       );
     }
-    this.target = target;
+    this.targets.set(target, target.getAudioNode());
   }
 
-  disconnect() {
-    this.target = null;
+  disconnect(target) {
+    this.targets.delete(target);
   }
 
   start(frequency, id) {
-    if (!this.target) {
+    if (this.targets.size === 0) {
       throw new Error(
         "PeriodicWave can't start before it is connected to an AudioTarget"
       );
@@ -81,7 +81,7 @@ class PeriodicWave extends AudioNode {
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
 
     oscillator.connect(gain);
-    gain.connect(this.target.getAudioNode());
+    this.targets.forEach(targetNode => gain.connect(targetNode));
     oscillator.start();
     gain.gain.linearRampToValueAtTime(1, context.currentTime + this.attack);
 
@@ -99,7 +99,7 @@ class PeriodicWave extends AudioNode {
       gain.gain.linearRampToValueAtTime(0, context.currentTime + decay);
       setTimeout(() => {
         oscillator.stop();
-        gain.disconnect(target.getAudioNode());
+        this.targets.forEach(targetNode => gain.disconnect(targetNode));
       }, decay * 1000);
     }
 
