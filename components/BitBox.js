@@ -109,6 +109,7 @@ class BitBox extends HTMLElement {
     <div id="container">
       <select id="config">
         <option></option>
+        <option>analyzer</option>
         <option>unconnected</option>
         <option>delay</option>
         <option>fourths</option>

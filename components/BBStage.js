@@ -1,5 +1,6 @@
 import { html, render } from "../lib/lit-html/lit-html.js";
 import "./BBPlugin.js";
+import "./BBAnalyzerNode.js";
 import Program from "../lib/Program.js";
 
 const PLUGIN_ROOT = "../plugins/";
@@ -198,7 +199,8 @@ class BBStage extends HTMLElement {
   }
 
   drawPlugin(name, plugin) {
-    const bbPlugin = document.createElement("bb-plugin");
+    const pluginName = plugin.constructor.stageComponent || "bb-plugin";
+    const bbPlugin = document.createElement(pluginName);
     if (this.program.meta && this.program.meta.positions) {
       const position = this.program.meta.positions[name] || [0, 0];
       bbPlugin.setPosition(position);

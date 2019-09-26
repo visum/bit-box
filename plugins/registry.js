@@ -1,4 +1,17 @@
 export default {
+  Analyzer: {
+    path: "AudioAnalyzer.js",
+    config: {
+      mode: [
+        "time",
+        "frequency"
+      ],
+      fftSize: "number",
+      smoothingTimeConstant: "number",
+      minDb: "number",
+      maxDb: "number"
+    }
+  },
   AudioDestination: {
     path:"AudioDestination.js"
   },
@@ -71,5 +84,6 @@ export default {
     config: {
       time: "number"
     }
-  }
+  },
+  
 };
