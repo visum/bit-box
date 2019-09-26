@@ -13,7 +13,12 @@ export const plugins = [
   },
   {
     "name": "noisemaker",
-    "path": "SineGenerator.js"
+    "path": "Oscillator.js",
+    "options": {
+      "waveType": "sine",
+      "attack": 0.2,
+      "decay": 0.3
+    }
   }
 ];
 export const patches = [

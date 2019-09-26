@@ -6,10 +6,13 @@ class Oscillator extends AudioNode {
     super(options);
     this.name = "Oscillator";
     this.waveType = options.waveType;
+    this.attack = options.attack;
+    this.decay = options.decay;
 
     EventTarget.apply(this);
 
     this.oscillators = {};
+    this.gains = {};
     this.target = null;
 
     this.eventHandlers = {
@@ -44,28 +47,41 @@ class Oscillator extends AudioNode {
       );
     }
 
-    const { context } = this;
+    const { context, oscillators, gains, target, waveType, attack } = this;
     if (this.oscillators[id]) {
       this.stop(id);
     }
 
+    const gain = context.createGain();
+    gain.gain.setValueAtTime(0, context.currentTime);
+
     const oscillator = context.createOscillator();
-    oscillator.type = this.waveType;
+    oscillator.type = waveType;
     oscillator.frequency.setValueAtTime(frequency, context.currentTime);
-    oscillator.connect(this.target.getAudioNode());
+    oscillator.connect(gain);
+    gain.connect(target.getAudioNode());
     oscillator.start();
-    this.oscillators[id] = oscillator;
+    gain.gain.linearRampToValueAtTime(1, context.currentTime + attack);
+
+    oscillators[id] = oscillator;
+    gains[id] = gain;
   }
 
   stop(id) {
-    const {target, oscillators} = this;
+    const {target, oscillators, gains, decay, context} = this;
     const oscillator = oscillators[id];
+    const gain = gains[id];
     if (oscillator) {
-      oscillator.stop();
-      oscillator.disconnect(target.getAudioNode());
+      gain.gain.setValueAtTime(gain.gain.value, context.currentTime);
+      gain.gain.linearRampToValueAtTime(0, context.currentTime + decay);
+      setTimeout(() => {
+        oscillator.stop();
+        gain.disconnect(target.getAudioNode());
+      }, decay * 1000);
     }
 
     oscillators[id] = null;
+    gains[id] = null;
   }
 
   handleEvent(event) {
@@ -78,7 +94,9 @@ class Oscillator extends AudioNode {
 }
 
 Oscillator.configTypes = {
-  waveType: "string"
+  waveType: "string",
+  attack: "number",
+  decay: "number"
 };
 
 Oscillator.respondsTo = {

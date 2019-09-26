@@ -15,7 +15,9 @@ export const plugins = [
     "name": "noisemaker",
     "path": "Oscillator.js",
     "options": {
-      "waveType": "square"
+      "waveType": "square",
+      "attack": 0.2,
+      "decay": 0.3
     }
   },
   {
