@@ -5,22 +5,11 @@ class AudioAnalyzer extends AudioNode {
     super(options);
     this.name="Analyzer";
     this._node = this.context.createAnalyser();
-    this._buffer = null;
-    this.fftSize = options.fftSize;
-    this.smoothingTimeConstant = options.smoothingTimeConstant;
-    this.minDb = options.minDb;
-    this.maxDb = options.maxDb;
-
-  }
-
-  get fftSize() {
-    return this._fftSize;
-  }
-
-  set fftSize(value) {
-    const { _node } = this;
-    _node.fftSize = value;
-    this._buffer = new Uint8Array(_node.frequencyBinCount);
+    this._node.minDecibels = -90;
+    this._node.maxDecibels = -10;
+    this._node.fftSize = 2048;
+    this._buffer = new Uint8Array(this._node.frequencyBinCount);
+    this._mode = options.mode;
   }
 
   get buffer() {
@@ -31,6 +20,22 @@ class AudioAnalyzer extends AudioNode {
     return this._node.frequencyBinCount;
   }
 
+  get mode() {
+    return this._mode;
+  }
+
+  set mode(value) {
+    this._mode = value;
+  }
+
+  get smoothingTimeConstant() {
+    return this._node.smoothingTimeConstant;
+  }
+
+  set smoothingTimeConstant(value) {
+    this._node.smoothingTimeConstant = value;
+  }
+
   updateTimeDomainData() {
     this._node.getByteTimeDomainData(this._buffer);
   }
@@ -39,17 +44,21 @@ class AudioAnalyzer extends AudioNode {
     this._node.getByteFrequencyData(this._buffer);
   }
 
+  updateBuffer() {
+    if (this._mode === "time") {
+      return this.updateTimeDomainData();
+    } else {
+      return this.updateFrequencyDomainData();
+    }
+  }
+
   getAudioNode() {
     return this._node;
   }
 }
 
 AudioAnalyzer.configTypes = {
-  fftSize: "number",
-  smoothingTimeConstant: "number",
-  minDb: "number",
-  maxDb: "number",
-  mode: "string"
+  smoothingTimeConstant: "number"
 };
 
 AudioAnalyzer.stageComponent = "bb-analyzer-node";

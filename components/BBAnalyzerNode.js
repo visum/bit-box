@@ -6,10 +6,10 @@ class BBAnalyzerNode extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this._plugin = null;
     this.name = "";
-    this.mode = "time";
     this.position = [0, 0];
     this.dimensions = [512, 300];
     this.pluginType = null;
+    this.mode = "time";
 
     render(this.render(), this.shadowRoot);
 
@@ -170,22 +170,21 @@ class BBAnalyzerNode extends HTMLElement {
   }
 
   drawFequencyData() {
+    // we'll just zoom in on the first 256 values of the data
     const {canvasContext, canvas, _plugin, dataBuffer} = this;
-    const {width, height} = canvas;
+    const {height} = canvas;
     _plugin.updateFrequencyDomainData();
     canvasContext.lineWidth = 2;
     canvasContext.strokeStyle = "rgb(0,0,0)";
-    const sliceWidth = width / _plugin.bufferSize;
     let x = 0;
     let i = 0;
-    while(i < 256) {
-      //const v = this.averageSlice(dataBuffer, i, sliceWidth) / 255;
+    while(i < 512) {
       const v = (dataBuffer[i] / 255) * height;
       canvasContext.beginPath();
       canvasContext.moveTo(x, height);
       canvasContext.lineTo(x, height - v);
       canvasContext.stroke();
-      x += 2;
+      x += 1;
       i += 1;
     }
     

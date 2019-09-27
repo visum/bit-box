@@ -23,13 +23,11 @@ class Gain extends AudioNode{
       throw new Error("Connection target of Gain does not implement getAudioNode()");
     }
 
-    this.target = target;
     this.gainNode.connect(target.getAudioNode());
   }
 
-  disconnect() {
-    this.gainNode.disconnect(this.target.getAudioNode());
-    this.target = null;
+  disconnect(target) {
+    this.gainNode.disconnect(target.getAudioNode());
   }
 
   getAudioNode() {

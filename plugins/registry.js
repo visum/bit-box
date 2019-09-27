@@ -2,14 +2,7 @@ export default {
   Analyzer: {
     path: "AudioAnalyzer.js",
     config: {
-      mode: [
-        "time",
-        "frequency"
-      ],
-      fftSize: "number",
-      smoothingTimeConstant: "number",
-      minDb: "number",
-      maxDb: "number"
+      smoothingTimeConstant: "number"
     }
   },
   AudioDestination: {

@@ -3,10 +3,7 @@ export const plugins = [
     "name": "Analyzer",
     "path": "AudioAnalyzer.js",
     "options": {
-      "smoothingTimeConstant": 0.85,
-      "fftSize": 2048,
-      "minDb": -90,
-      "maxDb": -10
+      "smoothingTimeConstant": 0.85
     }
   },
   {
