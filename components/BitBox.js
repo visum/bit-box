@@ -114,6 +114,7 @@ class BitBox extends HTMLElement {
         <option>delay</option>
         <option>fourths</option>
         <option>linearSamplerDemo</option>
+        <option>reverb</option>
         <option>samplerDemo</option>
         <option>simpleKeyboard</option>
         <option>periodicWave</option>

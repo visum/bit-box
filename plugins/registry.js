@@ -46,6 +46,16 @@ export default {
       decay: "number"
     }
   },
+  Reverb: {
+    path: "Reverb.js",
+    config: {
+      response: [
+        "AirportTerminal.mp3",
+        "OutdoorBlastoff.mp3",
+        "PlateMedium.mp3"
+      ]
+    }
+  },
   Sampler: {
     path: "Sampler.js",
     config: {
