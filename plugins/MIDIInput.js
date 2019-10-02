@@ -8,6 +8,7 @@ class MIDIInput extends Observable {
     this.access = null;
     this.options = options;
     this.playing = {};
+    this.channel = options.channel;
 
     if (navigator.requestMIDIAccess) {
       navigator.requestMIDIAccess().then(access => {

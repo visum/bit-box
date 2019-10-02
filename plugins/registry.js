@@ -37,6 +37,12 @@ export default {
       channel: "number"
     }
   },
+  NoteEventDelay: {
+    path: "NoteEventDelay.js",
+    config: {
+      time: "number"
+    }
+  },
   NoteToFrequency: {
     path: "NoteToFrequency.js"
   },
