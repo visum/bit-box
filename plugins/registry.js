@@ -31,6 +31,12 @@ export default {
       advance: "number"
     }
   },
+  MIDIInput: {
+    path: "MIDIInput.js",
+    config: {
+      channel: "number"
+    }
+  },
   NoteToFrequency: {
     path: "NoteToFrequency.js"
   },
@@ -87,6 +93,5 @@ export default {
     config: {
       time: "number"
     }
-  },
-  
+  }
 };
