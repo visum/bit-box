@@ -17,5 +17,7 @@
     "url": "https://github.com/visum/bit-box/issues"
   },
   "homepage": "https://github.com/visum/bit-box#readme",
-  "dependencies": {}
+  "dependencies": {
+    "serve": "^11.2.0"
+  }
 }

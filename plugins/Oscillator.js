@@ -21,6 +21,9 @@ class Oscillator extends AudioNode {
       },
       stopSound: ({ id }) => {
         this.stop(id);
+      },
+      slideSound: ({id, frequency, time}) => {
+        this.slide(frequency, id, time);
       }
     };
 
@@ -87,6 +90,14 @@ class Oscillator extends AudioNode {
 
     oscillators[id] = null;
     gains[id] = null;
+  }
+
+  slide(frequency, id, time) {
+    const {oscillators, context} = this;
+    const oscillator = oscillators[id];
+    if (oscillator) {
+      oscillator.frequency.setTargetAtTime(frequency, context.currentTime + time, 0.2)
+    }
   }
 
   handleEvent(event) {

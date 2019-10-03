@@ -22,6 +22,12 @@ class NoteToFrequency extends Observable {
       },
       stop: event => {
         this.notify({ ...event, type: "stopSound" });
+      },
+      slide: event => {
+        const noteNumber = notesToNumbers[event.note];
+        const frequency = frequencyTable[noteNumber];
+
+        this.notify({...event, type: "slideSound", frequency});
       }
     };
 

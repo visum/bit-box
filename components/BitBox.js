@@ -110,13 +110,13 @@ class BitBox extends HTMLElement {
       <select id="config">
         <option></option>
         <option>analyzer</option>
-        <option>unconnected</option>
         <option>delay</option>
         <option>fourths</option>
         <option>linearSamplerDemo</option>
         <option>midi</option>
         <option>reverb</option>
         <option>samplerDemo</option>
+        <option>socket</option>
         <option>simpleKeyboard</option>
         <option>periodicWave</option>
         <option>stub</option>

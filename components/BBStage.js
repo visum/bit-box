@@ -1,6 +1,7 @@
 import { html, render } from "../lib/lit-html/lit-html.js";
 import "./BBPlugin.js";
 import "./BBAnalyzerNode.js";
+import "./BBClock.js";
 import Program from "../lib/Program.js";
 
 const PLUGIN_ROOT = "../plugins/";

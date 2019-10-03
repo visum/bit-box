@@ -15,8 +15,7 @@ class NoteEventDelay extends Observable {
       play: event => {
         const newNoteId = getNoteId();
         this.playing[event.id] = newNoteId;
-        const forwardEvent = { ...event };
-        forwardEvent.id = newNoteId;
+        const forwardEvent = { ...event, id: newNoteId };
         setTimeout(() => {
           this.notify(forwardEvent);
         }, this.time * 1000);
@@ -25,8 +24,16 @@ class NoteEventDelay extends Observable {
         const newNoteId = this.playing[event.id];
         if (newNoteId) {
           this.playing[event.id] = null;
-          const forwardEvent = { ...event };
-          forwardEvent.id = newNoteId;
+          const forwardEvent = { ...event, id: newNoteId };
+          setTimeout(() => {
+            this.notify(forwardEvent);
+          }, this.time * 1000);
+        }
+      },
+      slide: event => {
+        const newNoteId = this.playing[event.id];
+        if (newNoteId) {
+          const forwardEvent = {...event, id: newNoteId};
           setTimeout(() => {
             this.notify(forwardEvent);
           }, this.time * 1000);

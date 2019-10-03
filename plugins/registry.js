@@ -11,6 +11,14 @@ export default {
   AudioNode: {
     path: "AudioNode.js"
   },
+  Clock: {
+    path: "Clock.js",
+    config: {
+      beatsPerMeasure: "number",
+      beatsPerMinute: "number",
+      ticksPerBeat: "number"
+    }
+  },
   Gain: {
     path: "Gain.js",
     config: {
@@ -98,6 +106,12 @@ export default {
     path: "Delay.js",
     config: {
       time: "number"
+    }
+  },
+  WebSocketInput: {
+    path: "WebSocketInput.js",
+    config: {
+      host: "string"
     }
   }
 };

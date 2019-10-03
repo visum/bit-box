@@ -27,6 +27,11 @@ class Transposer extends Observable {
         const newId = notesPlaying[id];
         this.notify({ id: newId, ...event });
         notesPlaying[id] = null;
+      },
+      slide: ({id, note, ...event}) => {
+        const newId = notesPlaying[id];
+        const newNote = numbersToNotes[notesToNumbers[note] + this.factor];
+        this.notify({ id: newId, note: newNote, ...event });
       }
     };
 
