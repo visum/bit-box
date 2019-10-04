@@ -14,15 +14,18 @@ export default {
       gain: "number"
     }
   },
-  AudioNode: {
-    path: "AudioNode.js"
-  },
   Clock: {
     path: "Clock.js",
     config: {
       beatsPerMeasure: "number",
       beatsPerMinute: "number",
       ticksPerBeat: "number"
+    }
+  },
+  Delay: {
+    path: "Delay.js",
+    config: {
+      time: "number"
     }
   },
   DrumMachine: {
@@ -90,6 +93,18 @@ export default {
       decay: "number"
     }
   },
+  PeriodicWave: {
+    path: "PeriodicWave.js",
+    config: {
+      waveTablePath: [
+        "../assets/waveTables/bass.js",
+        "../assets/waveTables/britBlues.js",
+        "../assets/waveTables/throaty.js"
+      ],
+      attack: "number",
+      decay: "number"
+    }
+  },
   Reverb: {
     path: "Reverb.js",
     config: {
@@ -103,33 +118,26 @@ export default {
   Sampler: {
     path: "Sampler.js",
     config: {
-      filePath: "string",
+      filePath: [
+        "../assets/bang.mp3",
+        "../assets/chip.mp3",
+        "../assets/hip.mp3",
+        "../assets/mao.mp3"
+      ],
       naturalNote: "string",
       loop: "boolean"
+    }
+  },
+  StereoPanner: {
+    path: "StereoPanner.js",
+    config: {
+      pan: "number"
     }
   },
   Transposer: {
     path: "Transposer.js",
     config: {
       factor: "number"
-    }
-  },
-  PeriodicWave: {
-    path: "PeriodicWave.js",
-    config: {
-      waveTablePath: [
-        "../assets/waveTables/bass.js",
-        "../assets/waveTables/britBlues.js",
-        "../assets/waveTables/throaty.js"
-      ],
-      attack: "number",
-      decay: "number"
-    }
-  },
-  Delay: {
-    path: "Delay.js",
-    config: {
-      time: "number"
     }
   },
   WebSocketInput: {

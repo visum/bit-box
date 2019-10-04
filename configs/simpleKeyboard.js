@@ -19,8 +19,23 @@ export const plugins = [
       "attack": 0.2,
       "decay": 0.3
     }
+  },
+  {
+    "name": "StereoPanner",
+    "path": "StereoPanner.js",
+    "options": {
+      "pan": 0
+    }
+  },
+  {
+    "name": "Gain",
+    "path": "Gain.js",
+    "options": {
+      "value": 0.5
+    }
   }
 ];
+
 export const patches = [
   {
     "source": "keyboardInput",
@@ -34,10 +49,21 @@ export const patches = [
   },
   {
     "source": "noisemaker",
+    "target": "StereoPanner",
+    "type": "audio"
+  },
+  {
+    "source": "StereoPanner",
+    "target": "Gain",
+    "type": "audio"
+  },
+  {
+    "source": "Gain",
     "target": "destination",
     "type": "audio"
   }
 ];
+
 export const meta = {
   "positions": {
     "keyboardInput": [
@@ -49,12 +75,20 @@ export const meta = {
       39
     ],
     "noisemaker": [
-      333,
-      30
+      277,
+      146
     ],
     "destination": [
-      505,
+      593,
       32
+    ],
+    "StereoPanner": [
+      380,
+      36
+    ],
+    "Gain": [
+      486,
+      147
     ]
   }
 };

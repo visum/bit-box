@@ -123,6 +123,7 @@ class BitBox extends HTMLElement {
         <option>socket</option>
         <option>simpleKeyboard</option>
         <option>periodicWave</option>
+        <option>phaseSetup</option>
         <option>stub</option>
       </select>
       <button id="new-program">New Program</button>
