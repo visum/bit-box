@@ -52,6 +52,8 @@ class WebSocketInput extends Observable {
         data.id = this.playing[data.clientId];
         this.playing[data.clientId] = null;
         this.notify(data);
+      } else {
+        this.notify(data);
       }
     });
 

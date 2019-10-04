@@ -19,7 +19,14 @@ const keyCodeToNote = {
   74: "B4", // "j"
   75: "C5", // "k"
   76: "D5", // "l"
-  186: "E5" // ";"
+  186: "E5", // ";"
+};
+
+const keyCodeToDrum = {
+  90: "bass", // "z"
+  88: "snare", // "x"
+  67: "hiHat", // "c"
+  86: "pop", // "v"
 };
 
 class KeyboardInput extends Observable {
@@ -38,6 +45,12 @@ class KeyboardInput extends Observable {
   }
 
   handleKeyDown(event) {
+    const drum = keyCodeToDrum[event.keyCode];
+    if (drum) {
+      this.notify({ type: "drum", subType: drum});
+      return
+    }
+
     if (this.keysDown[event.keyCode]) {
       return;
     }

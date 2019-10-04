@@ -22,7 +22,6 @@ class Gain extends AudioNode{
     if (typeof target.getAudioNode !== "function") {
       throw new Error("Connection target of Gain does not implement getAudioNode()");
     }
-
     this.gainNode.connect(target.getAudioNode());
   }
 

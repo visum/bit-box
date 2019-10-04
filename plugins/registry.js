@@ -8,6 +8,12 @@ export default {
   AudioDestination: {
     path:"AudioDestination.js"
   },
+  AudioInput:{
+    path: "AudioInput.js",
+    config: {
+      gain: "number"
+    }
+  },
   AudioNode: {
     path: "AudioNode.js"
   },
@@ -17,6 +23,12 @@ export default {
       beatsPerMeasure: "number",
       beatsPerMinute: "number",
       ticksPerBeat: "number"
+    }
+  },
+  DrumMachine: {
+    path: "DrumMachine.js",
+    config: {
+      gain: "number"
     }
   },
   Gain: {
@@ -43,6 +55,18 @@ export default {
     path: "MIDIInput.js",
     config: {
       channel: "number"
+    }
+  },
+  MIDIOutput: {
+    path: "MIDIOutput.js",
+    config: {
+      channel: "number"
+    }
+  },
+  NoteDetector: {
+    path: "NoteDetector.js",
+    config: {
+      interval: "number"
     }
   },
   NoteEventDelay: {

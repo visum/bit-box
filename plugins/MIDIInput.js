@@ -31,7 +31,7 @@ class MIDIInput extends Observable {
     const command = data[0];
     const note = numbersToNotes[data[1]];
     const velocity = data[2];
-    if (command === 144) {
+    if (command === 0x90) {
       if (velocity !== 0) {
         // channel 1 on
         const id = getNoteId();
