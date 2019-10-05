@@ -3,7 +3,7 @@ export const plugins = [
     "name": "WebSocketInput",
     "path": "WebSocketInput.js",
     "options": {
-      "host": "wss://192.168.2.119:8080"
+      "host": "wss://localhost:8080"
     }
   },
   {
@@ -29,6 +29,13 @@ export const plugins = [
   {
     "name": "AudioDestination",
     "path": "AudioDestination.js"
+  },
+  {
+    "name": "DrumMachine",
+    "path": "DrumMachine.js",
+    "options": {
+      "gain": 0.800000011920929
+    }
   }
 ];
 
@@ -51,6 +58,16 @@ export const patches = [
   {
     "source": "Gain",
     "target": "AudioDestination",
+    "type": "audio"
+  },
+  {
+    "source": "WebSocketInput",
+    "target": "DrumMachine",
+    "type": "event"
+  },
+  {
+    "source": "DrumMachine",
+    "target": "Gain",
     "type": "audio"
   }
 ];
@@ -76,6 +93,10 @@ export const meta = {
     "AudioDestination": [
       760,
       45
+    ],
+    "DrumMachine": [
+      209,
+      153
     ]
   }
 };
