@@ -1,7 +1,5 @@
 import { html, render } from "../lib/lit-html/lit-html.js";
 
-const isFn = value => typeof value === "function";
-
 class BBPlugin extends HTMLElement {
   constructor() {
     super();
@@ -9,46 +7,36 @@ class BBPlugin extends HTMLElement {
     this.position = [0, 0];
     this.dimensions = [140, 80];
     this.dragStartPosition = [0, 0];
-    this.name = "";
     this.pluginType = null;
-
-    render(this.render(), this.shadowRoot);
-
-    this.nameField = this.shadowRoot.querySelector("#name");
-    this.typeField = this.shadowRoot.querySelector("#type");
-    this.eventIn = this.shadowRoot.querySelector("#event-in");
-    this.eventOut = this.shadowRoot.querySelector("#event-out");
-    this.audioIn = this.shadowRoot.querySelector("#audio-in");
-    this.audioOut = this.shadowRoot.querySelector("#audio-out");
-    this.handle = this.shadowRoot.querySelector("#handle");
-    this.gear = this.shadowRoot.querySelector("#gear");
-    this.delete = this.shadowRoot.querySelector("#delete");
 
     this.startDrag = this.startDrag.bind(this);
     this.endDrag = this.endDrag.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
+  }
+
+  connectedCallback() {
+    this.render();
+
+    this.eventIn = this.select("#event-in");
+    this.eventOut = this.select("#event-out");
+    this.audioIn = this.select("#audio-in");
+    this.audioOut = this.select("#audio-out");
+    this.handle = this.select("#handle");
+    this.gear = this.select("#gear");
+    this.delete = this.select("#delete");
 
     this.attachEventListeners();
   }
 
+  select(selector) {
+    return this.shadowRoot.querySelector(selector);
+  }
+
   setPlugin(name, plugin) {
     this.pluginName = name;
-    this.nameField.textContent = name;
-    this.typeField.textContent = plugin.name;
     this.pluginType = plugin.name;
-
-    if (isFn(plugin.connect)) {
-      this.audioOut.classList.remove("inactive");
-    }
-    if (isFn(plugin.getAudioNode)) {
-      this.audioIn.classList.remove("inactive");
-    }
-    if (isFn(plugin.observe)) {
-      this.eventOut.classList.remove("inactive");
-    }
-    if (isFn(plugin.subscribeTo)) {
-      this.eventIn.classList.remove("inactive");
-    }
+    this._plugin = plugin;
+    this.render();
   }
 
   setPosition([x, y]) {
@@ -160,10 +148,35 @@ class BBPlugin extends HTMLElement {
   dispose() {
     this.handle.removeEventListener("mousedown", this.startDrag);
     this.handle.removeEventListener("mouseup", this.endDrag);
+    this._plugin.dispose && this._plugin.dispose();
+  }
+
+  getContent() {
+    // to be overridden by subclasses
+    return null;
+  }
+
+  getTools() {
+    // to be overridden by subclasses
+    return null;
+  }
+
+  getContentStyles() {
+    // to be overridden by subclasses
+    return "";
   }
 
   render() {
-    return html`
+    const [width, height] = this.dimensions;
+    const { pluginName, pluginType } = this;
+    const activeConnectors = {};
+    if (this._plugin) {
+      activeConnectors.audioOut = this._plugin.connect ? true : false;
+      activeConnectors.audioIn = this._plugin.getAudioNode ? true : false;
+      activeConnectors.eventOut = this._plugin.observe ? true : false;
+      activeConnectors.eventIn = this._plugin.subscribeTo ? true : false;
+    }
+    const content = html`
       <style>
         * {
           box-sizing: border-box;
@@ -172,8 +185,8 @@ class BBPlugin extends HTMLElement {
         :host {
           border: 1px solid black;
           position: absolute;
-          width: 140px;
-          height: 80px;
+          width: ${width}px;
+          height: ${height}px;
         }
 
         #name {
@@ -185,52 +198,64 @@ class BBPlugin extends HTMLElement {
           font-size: 0.7rem;
         }
 
-        #event-connectors {
-          position: absolute;
-          top: 0;
-          width: 100%;
-          height: 10px;
-        }
-
-        #audio-connectors {
-          position: absolute;
-          bottom: 0;
-          width: 100%;
-          height: 10px;
-        }
-
         #info {
           position: absolute;
-          top: 15px;
-          bottom: 25px;
+          top: 25px;
           left: 25px;
+          height: 30px;
           width: 85px;
           background-color: rgba(255, 255, 255, 0.7);
         }
 
-        #handle {
+        #tools {
           position: absolute;
-          left: 0;
-          top: 10px;
+          left: 20px;
+          right: 20px;
+          display: flex;
+        }
+
+        #standard-tools {
+          width: 80px;
+          display: flex;
+          justify-content: space-between;
+        }
+
+        #more-tools {
+          padding-left: 10px;
+        }
+
+        #handle {
           width: 15px;
           height: 15px;
           cursor: grab;
         }
 
         #gear {
-          position: absolute;
-          left: 0;
-          top: 35px;
           width: 15px;
           height: 15px;
           cursor: pointer;
         }
 
         #delete {
-          position: absolute;
-          bottom: 0;
-          left: 58px;
+          width: 15px;
+          height: 15px;
           cursor: pointer;
+        }
+
+        #input-connectors {
+          position: absolute;
+          left: 0;
+          width: 10px;
+          top: 0;
+          bottom: 0;
+        }
+
+        #output-connectors {
+          position: absolute;
+          right: 0;
+          top: 0;
+          bottom: 0;
+          width: 10px;
         }
 
         .connector {
@@ -264,25 +289,55 @@ class BBPlugin extends HTMLElement {
           bottom: 0;
           right: 0;
         }
-      </style>
 
-      <div id="handle">🖐🏽</div>
-      <div id="gear">⚙️</div>
-      <div id="delete">🗑</div>
+        #content {
+          position: absolute;
+          top: 60px;
+          left: 0px;
+          right: 0px;
+          bottom: 0;
+        }
+
+        ${this.getContentStyles()}
+      </style>
+      <div id="tools">
+        <div id="standard-tools">
+          <div id="handle">🖐🏽</div>
+          <div id="gear">⚙️</div>
+          <div id="delete">🗑</div>
+        </div>
+        <div id="more-tools">${this.getTools()}</div>
+      </div>
       <div id="info">
-        <h3 id="name"></h3>
-        <span id="type"></span>
+        <h3 id="name">${pluginName}</h3>
+        <span id="type">${pluginType}</span>
       </div>
-      <div id="event-connectors">
-        <div id="event-in" class="connector inactive"></div>
-        <div id="event-out" class="connector inactive"></div>
+      <div id="content">${this.getContent()}</div>
+      <div id="input-connectors">
+        <div
+          id="event-in"
+          class="connector ${!activeConnectors.eventIn && "inactive"}"
+        ></div>
+        <div
+          id="audio-in"
+          class="connector ${!activeConnectors.audioIn && "inactive"}"
+        ></div>
       </div>
-      <div id="audio-connectors">
-        <div id="audio-in" class="connector inactive"></div>
-        <div id="audio-out" class="connector inactive"></div>
+      <div id="output-connectors">
+        <div
+          id="event-out"
+          class="connector ${!activeConnectors.eventOut && "inactive"}"
+        ></div>
+        <div
+          id="audio-out"
+          class="connector ${!activeConnectors.audioOut && "inactive"}"
+        ></div>
       </div>
     `;
+    render(content, this.shadowRoot);
   }
 }
 
 window.customElements.define("bb-plugin", BBPlugin);
+
+export default BBPlugin;

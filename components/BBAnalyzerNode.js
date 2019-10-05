@@ -1,121 +1,32 @@
-import { html, render } from "../lib/lit-html/lit-html.js";
+import { html } from "../lib/lit-html/lit-html.js";
+import BBPlugin from "./BBPlugin.js";
 
-class BBAnalyzerNode extends HTMLElement {
+class BBAnalyzerNode extends BBPlugin {
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
-    this._plugin = null;
-    this.name = "";
-    this.position = [0, 0];
-    this.dimensions = [512, 300];
-    this.pluginType = null;
+    this.dimensions = [512, 330];
     this.mode = "time";
-
-    render(this.render(), this.shadowRoot);
-
-    this.gear = this.shadowRoot.querySelector("#gear");
-    this.handle = this.shadowRoot.querySelector("#handle");
-    this.audioIn = this.shadowRoot.querySelector("#audio-in");
-    this.delete = this.shadowRoot.querySelector("#delete");
-    this.canvas = this.shadowRoot.querySelector("#canvas");
-    this.name = this.shadowRoot.querySelector("#name");
-    this.type = this.shadowRoot.querySelector("#type");
-    this.modeToggle = this.shadowRoot.querySelector("#mode-toggle");
-    this.canvasContext = this.canvas.getContext("2d");
     this.running = false;
+  }
 
-    this.startDrag = this.startDrag.bind(this);
-    this.endDrag = this.endDrag.bind(this);
-    this.handleDrag = this.handleDrag.bind(this);
-
-    this.attachEventListeners();
+  connectedCallback() {
+    super.connectedCallback();
+    this.canvas = this.select("#canvas");
+    this.canvasContext = this.canvas.getContext("2d");
   }
 
   attachEventListeners() {
-    this.handle.addEventListener("mousedown", this.startDrag);
-    this.handle.addEventListener("mouseup", this.endDrag);
+    super.attachEventListeners();
 
-    this.modeToggle.addEventListener("click", () => {
+    this.select("#mode-toggle").addEventListener("click", () => {
       this.mode = this.mode === "time" ? "frequency" : "time";
-      render(this.render(), this.shadowRoot);
+      this.render();
     });
-
-    this.gear.addEventListener("click", () => {
-      this.dispatchEvent(
-        new CustomEvent("configurePlugin", {
-          bubbles: true,
-          composed: true,
-          detail: { pluginName: this.pluginName, pluginType: this.pluginType }
-        })
-      );
-    });
-
-    this.delete.addEventListener("click", () => {
-      this.dispatchEvent(
-        new CustomEvent("deletePlugin", {
-          bubbles: true,
-          composed: true,
-          detail: { pluginName: this.pluginName }
-        })
-      );
-    });
-
-    this.audioIn.addEventListener("mouseup", () =>
-      this.dispatchEvent(
-        new CustomEvent("endAudioConnection", {
-          bubbles: true,
-          composed: true,
-          detail: { pluginName: this.pluginName }
-        })
-      )
-    );
-  }
-
-  handleDrag(event) {
-    const deltas = [
-      event.clientX - this.dragStartPosition[0],
-      event.clientY - this.dragStartPosition[1]
-    ];
-    this.dragStartPosition = [event.clientX, event.clientY];
-    this.dragHandler(this, deltas);
-  }
-
-  startDrag(event) {
-    document.addEventListener("mousemove", this.handleDrag);
-    this.dragStartPosition = [event.clientX, event.clientY];
-    this.handle.textContent = "✊🏽";
-  }
-
-  endDrag() {
-    document.removeEventListener("mousemove", this.handleDrag);
-    this.handle.textContent = "🖐🏽";
-  }
-
-  setPosition([x, y]) {
-    this.position = [x, y];
-    this.shadowRoot.host.style.left = `${x}px`;
-    this.shadowRoot.host.style.top = `${y}px`;
-  }
-
-  getConnectorPositions() {
-    const [x, y] = this.position;
-    const [, height] = this.dimensions;
-    return {
-      audioIn: [x + 6, y + height - 4]
-    };
-  }
-
-  setDragHandler(handler) {
-    this.dragHandler = handler;
   }
 
   setPlugin(name, plugin) {
-    this.pluginName = name;
-    this.pluginType = plugin.name;
-    this._plugin = plugin;
+    super.setPlugin(name, plugin);
     this.dataBuffer = plugin.buffer;
-    this.name.textContent = name;
-    this.type.textContent = plugin.name;
     this.start();
   }
 
@@ -200,96 +111,23 @@ class BBAnalyzerNode extends HTMLElement {
     this.tick();
   }
 
-  dispose() {
-    this.handle.removeEventListener("mousedown", this.startDrag);
-    this.handle.removeEventListener("mouseup", this.endDrag);
+  getContent() {
+    return html`<canvas id="canvas" width="512" height="300"></canvas>`;
   }
 
-  render() {
-    return html`
-      <style>
-        * {
-          box-sizing: border-box;
-        }
-
-        :host {
-          width: 512px;
-          height: 300px;
-          position: absolute;
-          border: 1px solid black;
-        }
-
-        #info {
-          position: absolute;
-          top: 15px;
-          height: 30px;
-          left: 25px;
-          width: 85px;
-          background-color: rgba(255, 255, 255, 0.7);
-        }
-
-        #name {
-          font-size: 0.8rem;
-          margin: 0;
-        }
-
-        #type {
-          font-size: 0.7rem;
-        }
-
-        #handle {
-          position: absolute;
-          left: 0;
-          top: 10px;
-          width: 15px;
-          height: 15px;
-          cursor: grab;
-        }
-
-        #gear {
-          position: absolute;
-          left: 0;
-          top: 35px;
-          width: 15px;
-          height: 15px;
-          cursor: pointer;
-        }
-
-        #audio-in {
-          bottom: 0;
-          left: 0;
-          border: 1px solid black;
-          position: absolute;
-          width: 10px;
-          height: 10px;
-          cursor: crosshair;
-        }
-
-        #delete {
-          position: absolute;
-          bottom: 0;
-          left: 58px;
-          cursor: pointer;
-        }
-
-        #mode-toggle {
-          position: absolute;
-          top: 0;
-          left: 60px;
-        }
-      </style>
-      <canvas id="canvas" width="512" height="300"></canvas>
-      <div id="info">
-        <h3 id="name"></h3>
-        <span id="type"></span>
-      </div>
-      <div id="handle">🖐🏽</div>
-      <div id="gear">⚙️</div>
-      <div id="delete">🗑</div>
-      <button id="mode-toggle">${this.mode}</button>
-      <div id="audio-in"></div>
+  getContentStyles() {
+    return `
+    #canvas {
+      position: relative;
+      top: -30px;
+    }
     `;
   }
+
+  getTools() {
+    return html`<button id="mode-toggle">${this.mode}</button>`;
+  }
+
 }
 
 window.customElements.define("bb-analyzer-node", BBAnalyzerNode);
