@@ -2,6 +2,8 @@
 
 A music machine made in the browser
 
+See it in action here: https://visum.github.io/bit-box/
+
 ## Features
 
 * 99% browser metal
