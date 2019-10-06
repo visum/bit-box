@@ -122,6 +122,7 @@ class BitBox extends HTMLElement {
         <option>samplerDemo</option>
         <option>socket</option>
         <option>simpleKeyboard</option>
+        <option>strummer</option>
         <option>periodicWave</option>
         <option>phaseSetup</option>
         <option>stub</option>

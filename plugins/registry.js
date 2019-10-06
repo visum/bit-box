@@ -121,6 +121,7 @@ export default {
       filePath: [
         "../assets/bang.mp3",
         "../assets/chip.mp3",
+        "../assets/harp_c3.mp3",
         "../assets/hip.mp3",
         "../assets/mao.mp3"
       ],
@@ -132,6 +133,13 @@ export default {
     path: "StereoPanner.js",
     config: {
       pan: "number"
+    }
+  },
+  Strummer: {
+    path: "Strummer.js",
+    config: {
+      noteDelayMs: "number",
+      noteDurationMs: "number"
     }
   },
   Transposer: {

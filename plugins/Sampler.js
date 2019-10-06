@@ -15,6 +15,7 @@ class Sampler extends AudioNode {
     this.buffer = null;
     this.naturalNote = options.naturalNote;
     this.loop = options.loop;
+    this._filePath = null;
     this.filePath = options.filePath;
     this.context = options.context;
 
@@ -27,14 +28,22 @@ class Sampler extends AudioNode {
       }
     };
 
-    this.load();
 
     this.handleEvent = this.handleEvent.bind(this);
   }
 
+  set filePath(value) {
+    this._filePath = value;
+    this.load();
+  }
+
+  get filePath() {
+    return this._filePath;
+  }
+
   async load() {
-    const {filePath, context} = this;
-    const audioData = await (await fetch(filePath)).arrayBuffer();
+    const {_filePath, context} = this;
+    const audioData = await (await fetch(_filePath)).arrayBuffer();
     context.decodeAudioData(audioData, buffer => {
       this.buffer = buffer;
     });
@@ -43,7 +52,7 @@ class Sampler extends AudioNode {
   start(note, id) {
     const {context, buffer, targets, naturalNote, loop} = this;
     if (targets.size === 0) {
-      console.error("LinearSampler can't play before it is connected to a source");
+      console.error("Sampler can't play before it is connected to a source");
       return;
     }
     if (!buffer) {
@@ -88,7 +97,7 @@ class Sampler extends AudioNode {
   downRamp(player, duration) {
     const {context} = this;
     return new Promise((resolve) => {
-      player.gainNode.gain.setValueAtTime(0, context.currentTime + duration);
+      player.gainNode.gain.linearRampToValueAtTime(0, context.currentTime + duration);
       setTimeout(resolve, duration);
     });
   }
