@@ -4,6 +4,8 @@ import "./BBAnalyzerNode.js";
 import "./BBClock.js";
 import Program from "../lib/Program.js";
 
+const AC = window.AudioContext || window.webkitAudioContext;
+
 const PLUGIN_ROOT = "../plugins/";
 
 class BBStage extends HTMLElement {
@@ -139,7 +141,7 @@ class BBStage extends HTMLElement {
       this.program.dispose();
       this.clearPlugins();
     }
-    this.program = new Program({ context: new AudioContext() });
+    this.program = new Program({ context: new AC() });
     this.draw();
   }
 
@@ -162,8 +164,7 @@ class BBStage extends HTMLElement {
     this.program && this.program.dispose();
     this.clearPlugins();
 
-    const audioContext = new AudioContext();
-    this.program = new Program({ context: audioContext });
+    this.program = new Program({ context: new AC() });
     await this.program.loadConfig(path, PLUGIN_ROOT);
     this.draw();
   }
