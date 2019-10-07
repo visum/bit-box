@@ -96,7 +96,7 @@ class Oscillator extends AudioNode {
     const {oscillators, context} = this;
     const oscillator = oscillators[id];
     if (oscillator) {
-      oscillator.frequency.setTargetAtTime(frequency, context.currentTime + time, 0.2)
+      oscillator.frequency.setTargetAtTime(frequency, context.currentTime + time, 0.2);
     }
   }
 

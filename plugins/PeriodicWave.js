@@ -11,7 +11,7 @@ class PeriodicWave extends AudioNode {
 
     EventTarget.apply(this);
 
-    this.periodicWave = this.context.createPeriodicWave([0, 1], [0, 0]);
+    this.periodicWave = this.context.createPeriodicWave(Float32Array.from([0, 1]), Float32Array.from([0, 0]));
 
     this.oscillators = {};
     this.gains = {};
@@ -44,7 +44,7 @@ class PeriodicWave extends AudioNode {
 
   async loadWaveTable(path) {
     const table = (await import(path)).default;
-    this.periodicWave = this.context.createPeriodicWave(table.real, table.imag);
+    this.periodicWave = this.context.createPeriodicWave(Float32Array.from(table.real), Float32Array.from(table.imag));
   }
 
   connect(target) {

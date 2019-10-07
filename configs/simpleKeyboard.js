@@ -21,13 +21,6 @@ export const plugins = [
     }
   },
   {
-    "name": "StereoPanner",
-    "path": "StereoPanner.js",
-    "options": {
-      "pan": 0
-    }
-  },
-  {
     "name": "Gain",
     "path": "Gain.js",
     "options": {
@@ -48,18 +41,13 @@ export const patches = [
     "type": "event"
   },
   {
-    "source": "noisemaker",
-    "target": "StereoPanner",
-    "type": "audio"
-  },
-  {
-    "source": "StereoPanner",
-    "target": "Gain",
-    "type": "audio"
-  },
-  {
     "source": "Gain",
     "target": "destination",
+    "type": "audio"
+  },
+  {
+    "source": "noisemaker",
+    "target": "Gain",
     "type": "audio"
   }
 ];

@@ -148,7 +148,6 @@ class BBPlugin extends HTMLElement {
   dispose() {
     this.handle.removeEventListener("mousedown", this.startDrag);
     this.handle.removeEventListener("mouseup", this.endDrag);
-    this._plugin.dispose && this._plugin.dispose();
   }
 
   getContent() {
