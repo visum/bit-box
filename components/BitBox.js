@@ -112,6 +112,7 @@ class BitBox extends HTMLElement {
         <option>analyzer</option>
         <option>delay</option>
         <option>drumMachine</options>
+        <option>eventTrigger</options>
         <option>fourths</option>
         <option>linearSamplerDemo</option>
         <option>liveNoteDetector</option>

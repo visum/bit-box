@@ -34,6 +34,12 @@ export default {
       gain: "number"
     }
   },
+  EventTrigger: {
+    path: "EventTrigger.js",
+    config: {
+      event: "string"
+    }
+  },
   Gain: {
     path: "Gain.js",
     config: {
@@ -140,6 +146,12 @@ export default {
     config: {
       noteDelayMs: "number",
       noteDurationMs: "number"
+    }
+  },
+  TimedRelease:{
+    path: "TimedRelease.js",
+    config: {
+      time: "number"
     }
   },
   Transposer: {
