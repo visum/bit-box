@@ -105,6 +105,8 @@ export default {
       waveTablePath: [
         "../assets/waveTables/bass.js",
         "../assets/waveTables/britBlues.js",
+        "../assets/waveTables/celeste.js",
+        "../assets/waveTables/dynaEPMed.js",
         "../assets/waveTables/throaty.js"
       ],
       attack: "number",

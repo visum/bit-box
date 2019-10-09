@@ -5,7 +5,7 @@ class Delay extends AudioNode {
     super(options);
     this.name = "Delay";
     this._time = 0;
-    this.delayNode = this.context.createDelay(5);
+    this.delayNode = this.context.createDelay(20);
     this.time = options.time;
   }
 

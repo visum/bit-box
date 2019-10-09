@@ -109,6 +109,7 @@ class BitBox extends HTMLElement {
     <div id="container">
       <select id="config">
         <option></option>
+        <option>airports</option>
         <option>analyzer</option>
         <option>delay</option>
         <option>drumMachine</options>
@@ -119,6 +120,7 @@ class BitBox extends HTMLElement {
         <option>midi</option>
         <option>midiOut</option>
         <option>noteDetector</option>
+        <option>organ</option>
         <option>reverb</option>
         <option>samplerDemo</option>
         <option>socket</option>
